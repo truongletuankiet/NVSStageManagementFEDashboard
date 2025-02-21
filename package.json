@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lodash": "^4.17.15",
     "@types/node": "^20.17.17",
     "@types/numeral": "^2.0.5",
     "@types/react": "^19",
