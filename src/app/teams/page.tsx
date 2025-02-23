@@ -20,7 +20,7 @@ const CustomToolbar = () => (
 );
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "Team ID", width: 100 },
+  { field: "teamId", headerName: "Team ID", width: 100 },
   { field: "teamName", headerName: "Team Name", width: 200 },
   { field: "productOwnerUsername", headerName: "Product Owner", width: 200 },
   {
@@ -45,6 +45,7 @@ const Teams = () => {
           rows={teams || []}
           columns={columns}
           pagination
+          getRowId={(row) => row.teamId} // Đảm bảo mỗi hàng có id duy nhất
           slots={{
             toolbar: CustomToolbar,
           }}

@@ -26,7 +26,9 @@ export enum Status {
 export interface User {
   userId?: number;
   username: string;
+  fullname: string;
   email: string;
+  userDetails?: string;
   profilePictureUrl?: string;
   cognitoId?: string;
   teamId?: number;
@@ -74,11 +76,25 @@ export interface Team {
 }
 
 // === MOCK DATA ===
+const mockTeams: Team[] = [
+  { teamId: 1, teamName: "Vietnamese Traditional Music" },
+  { teamId: 2, teamName: "Western Musical Instruments" },
+  { teamId: 3, teamName: "Vocal Performance" },
+  { teamId: 4, teamName: "Stage Performance Management" },
+  { teamId: 5, teamName: "Resource and Equipment Management" },
+];
+
 const mockUsers: User[] = [
-  { userId: 1, username: "truongletuankiet", email: "truongletuankiet@example.com", profilePictureUrl: "/avatar1.png", teamId: 1 },
-  { userId: 2, username: "hoangminhtuan", email: "hoangminhtuan@example.com", profilePictureUrl: "/avatar2.png", teamId: 1 },
-  { userId: 3, username: "phamduchuy", email: "phamduchuy@example.com", profilePictureUrl: "/avatar3.png", teamId: 2 },
-  { userId: 4, username: "dothanhhuy", email: "dothanhhuy@example.com", profilePictureUrl: "/avatar4.png", teamId: 2 },
+  { userId: 1, username: "nguyenvanminh", fullname: "PGS.TS. Nguyễn Văn Minh", email: "nguyenvanminh@example.com", userDetails: "Dean of Vietnamese Traditional Music", teamId: 1 },
+  { userId: 2, username: "lethihonglien", fullname: "TS. Lê Thị Hồng Liên", email: "lethihonglien@example.com", userDetails: "Expert in đàn Tranh", teamId: 1 },
+  { userId: 3, username: "tranquochung", fullname: "ThS. Trần Quốc Hùng", email: "tranquochung@example.com", userDetails: "Expert in đàn Bầu", teamId: 1 },
+  { userId: 4, username: "phamngocdung", fullname: "ThS. Phạm Ngọc Dũng", email: "phamngocdung@example.com", userDetails: "Expert in đàn Nhị", teamId: 1 },
+  { userId: 5, username: "buithanhbinh", fullname: "NSƯT. Bùi Thanh Bình", email: "buithanhbinh@example.com", userDetails: "Expert in Southern ceremonial music", teamId: 1 },
+  { userId: 6, username: "tranmanhtuan", fullname: "GS.TS. Trần Mạnh Tuấn", email: "tranmanhtuan@example.com", userDetails: "Dean of Western Musical Instruments", teamId: 2 },
+  { userId: 7, username: "nguyenquochung", fullname: "TS. Nguyễn Quốc Hùng", email: "nguyenquochung@example.com", userDetails: "Piano Expert", teamId: 2 },
+  { userId: 8, username: "phamduykhanh", fullname: "ThS. Phạm Duy Khánh", email: "phamduykhanh@example.com", userDetails: "Violin Expert", teamId: 2 },
+  { userId: 9, username: "trinhhoaian", fullname: "ThS. Trịnh Hoài An", email: "trinhhoaian@example.com", userDetails: "Cello Expert", teamId: 2 },
+  { userId: 10, username: "lethanhphong", fullname: "NSƯT. Lê Thanh Phong", email: "lethanhphong@example.com", userDetails: "Guitar Expert", teamId: 2 },
 ];
 
 const mockProjects: Project[] = [
@@ -156,17 +172,21 @@ const mockProjects: Project[] = [
 
 
 const mockTasks: Task[] = [
-  { id: 1, title: "Setup database", description: "Initialize MySQL schema", status: Status.ToDo, priority: Priority.High, projectId: 1, authorUserId: 1, assignedUserId: 2, startDate: "2025-01-10", dueDate: "2025-02-01" },
-  { id: 2, title: "Build React UI", description: "Design the front-end for the admin panel", status: Status.WorkInProgress, priority: Priority.Medium, projectId: 1, authorUserId: 2, assignedUserId: 1, startDate: "2025-02-01", dueDate: "2025-03-01" },
-  { id: 3, title: "API Development", description: "Develop RESTful APIs", status: Status.UnderReview, priority: Priority.Urgent, projectId: 1, authorUserId: 3, assignedUserId: 4, startDate: "2025-01-20", dueDate: "2025-02-15" },
-  { id: 4, title: "User Authentication", description: "Implement OAuth and JWT", status: Status.Completed, priority: Priority.High, projectId: 2, authorUserId: 2, assignedUserId: 3, startDate: "2025-02-10", dueDate: "2025-03-05" },
-  { id: 5, title: "Automate Light Configurations", description: "Develop smart light patterns", status: Status.ToDo, priority: Priority.Low, projectId: 3, authorUserId: 4, assignedUserId: 1, startDate: "2024-12-01", dueDate: "2025-04-01" },
+  // Tasks for La Traviata Stage Production
+  { id: 1, title: "Setup stage lighting", description: "Install and configure lighting system.", status: Status.ToDo, priority: Priority.High, projectId: 1, authorUserId: 1, assignedUserId: 2, startDate: "2025-02-10", dueDate: "2025-03-01" },
+  { id: 2, title: "Coordinate costume fitting", description: "Arrange fittings for main cast.", status: Status.WorkInProgress, priority: Priority.Medium, projectId: 1, authorUserId: 2, assignedUserId: 3, startDate: "2025-02-15", dueDate: "2025-03-10" },
+  { id: 3, title: "Rehearsal scheduling", description: "Plan and finalize rehearsal schedule.", status: Status.ToDo, priority: Priority.High, projectId: 1, authorUserId: 3, assignedUserId: 4, startDate: "2025-02-20", dueDate: "2025-03-15" },
+  { id: 4, title: "Marketing campaign launch", description: "Kickstart online and offline marketing.", status: Status.ToDo, priority: Priority.Urgent, projectId: 1, authorUserId: 4, assignedUserId: 1, startDate: "2025-03-01", dueDate: "2025-04-01" },
+  { id: 5, title: "Technical rehearsal", description: "Run full dress rehearsal with tech elements.", status: Status.ToDo, priority: Priority.High, projectId: 1, authorUserId: 1, assignedUserId: 2, startDate: "2025-03-10", dueDate: "2025-03-30" },
+
+  // Tasks for The Magic Flute Interactive Experience
+  { id: 6, title: "Develop interactive visuals", description: "Create digital projections for audience engagement.", status: Status.WorkInProgress, priority: Priority.Medium, projectId: 2, authorUserId: 3, assignedUserId: 4, startDate: "2025-03-15", dueDate: "2025-05-01" },
+  { id: 7, title: "Build augmented reality app", description: "Develop AR experience for audience.", status: Status.ToDo, priority: Priority.High, projectId: 2, authorUserId: 1, assignedUserId: 3, startDate: "2025-04-01", dueDate: "2025-06-01" },
+  { id: 8, title: "Choreography refinement", description: "Finalize choreography for stage movement.", status: Status.ToDo, priority: Priority.Medium, projectId: 2, authorUserId: 2, assignedUserId: 1, startDate: "2025-04-10", dueDate: "2025-05-20" },
+  { id: 9, title: "Community engagement event", description: "Host pre-show discussions and workshops.", status: Status.ToDo, priority: Priority.Low, projectId: 2, authorUserId: 4, assignedUserId: 2, startDate: "2025-04-20", dueDate: "2025-06-10" },
+  { id: 10, title: "Stage setup", description: "Arrange stage props and effects.", status: Status.ToDo, priority: Priority.High, projectId: 2, authorUserId: 3, assignedUserId: 4, startDate: "2025-04-25", dueDate: "2025-06-15" },
 ];
 
-const mockTeams: Team[] = [
-  { teamId: 1, teamName: "Dev Team", productOwnerUserId: 1, projectManagerUserId: 2 },
-  { teamId: 2, teamName: "QA Team", productOwnerUserId: 3, projectManagerUserId: 4 },
-];
 
 // === API ENDPOINTS (FAKE) ===
 export const api = createApi({

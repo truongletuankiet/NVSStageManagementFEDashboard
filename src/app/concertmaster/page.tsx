@@ -7,7 +7,7 @@ import {
   useGetProjectsQuery,
   useGetTasksQuery,
 } from "@/state/api";
-import React from "react";
+import React, { useState } from "react";
 import { useAppSelector } from "../redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
@@ -25,6 +25,8 @@ import {
   YAxis,
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
+import ProjectCard from "@/components/ProjectCard";
+import ProjectHeader from "../projects/ProjectHeader";
 
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
@@ -45,6 +47,7 @@ const ConcertMaster = () => {
     useGetProjectsQuery();
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const [activeTab, setActiveTab] = useState("Board");
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -94,6 +97,7 @@ const ConcertMaster = () => {
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
       <Header name="Dashboard of Concert Master" />
+      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
@@ -139,19 +143,15 @@ const ConcertMaster = () => {
         </div>
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
-            Your Tasks
+            HCMC Conservatory Projects
           </h3>
-          <div style={{ height: 400, width: "100%" }}>
-            <DataGrid
-              rows={tasks}
-              columns={taskColumns}
-              checkboxSelection
-              loading={tasksLoading}
-              getRowClassName={() => "data-grid-row"}
-              getCellClassName={() => "data-grid-cell"}
-              className={dataGridClassNames}
-              sx={dataGridSxStyles(isDarkMode)}
-            />
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
+            <h3 className="mb-4 text-lg font-semibold dark:text-white">Projects</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
