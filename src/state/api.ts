@@ -1,5 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Project {
   id: number;
@@ -74,93 +73,175 @@ export interface Team {
   projectManagerUserId?: number;
 }
 
+// === MOCK DATA ===
+const mockUsers: User[] = [
+  { userId: 1, username: "truongletuankiet", email: "truongletuankiet@example.com", profilePictureUrl: "/avatar1.png", teamId: 1 },
+  { userId: 2, username: "hoangminhtuan", email: "hoangminhtuan@example.com", profilePictureUrl: "/avatar2.png", teamId: 1 },
+  { userId: 3, username: "phamduchuy", email: "phamduchuy@example.com", profilePictureUrl: "/avatar3.png", teamId: 2 },
+  { userId: 4, username: "dothanhhuy", email: "dothanhhuy@example.com", profilePictureUrl: "/avatar4.png", teamId: 2 },
+];
+
+const mockProjects: Project[] = [
+  {
+    id: 1,
+    name: "La Traviata Stage Production",
+    description: "A full-scale production of Verdi's 'La Traviata', featuring elaborate stage design and live orchestration.",
+    startDate: "2025-03-01",
+    endDate: "2025-08-30",
+  },
+  {
+    id: 2,
+    name: "The Magic Flute Interactive Experience",
+    description: "An immersive performance of Mozart's 'The Magic Flute' with digital projections and audience participation.",
+    startDate: "2025-04-15",
+    endDate: "2025-10-10",
+  },
+  {
+    id: 3,
+    name: "Carmen Open-Air Performance",
+    description: "An outdoor rendition of Bizet's 'Carmen' set in a grand plaza, blending traditional and modern elements.",
+    startDate: "2025-05-20",
+    endDate: "2025-09-15",
+  },
+  {
+    id: 4,
+    name: "Aida Grand Stage Adaptation",
+    description: "A large-scale production of Verdi’s 'Aida' with intricate set designs and a massive cast.",
+    startDate: "2025-02-10",
+    endDate: "2025-07-25",
+  },
+  {
+    id: 5,
+    name: "Don Giovanni Virtual Reality Opera",
+    description: "A high-tech adaptation of Mozart’s 'Don Giovanni', incorporating VR elements for an immersive experience.",
+    startDate: "2025-06-01",
+    endDate: "2025-12-15",
+  },
+  {
+    id: 6,
+    name: "Tosca Historical Performance",
+    description: "A historically accurate performance of Puccini’s 'Tosca' with period costumes and set designs.",
+    startDate: "2025-07-10",
+    endDate: "2025-11-30",
+  },
+  {
+    id: 7,
+    name: "The Barber of Seville Comedy Opera",
+    description: "A lively and humorous staging of Rossini’s 'The Barber of Seville', emphasizing its comedic elements.",
+    startDate: "2025-08-05",
+    endDate: "2025-12-20",
+  },
+  {
+    id: 8,
+    name: "Turandot Spectacular Lighting Show",
+    description: "A production of Puccini’s 'Turandot' featuring state-of-the-art lighting and 3D mapping technology.",
+    startDate: "2025-09-01",
+    endDate: "2026-02-28",
+  },
+  {
+    id: 9,
+    name: "Rigoletto Street Opera Festival",
+    description: "A unique street performance of Verdi’s 'Rigoletto', bringing opera to unconventional outdoor spaces.",
+    startDate: "2025-10-15",
+    endDate: "2026-03-10",
+  },
+  {
+    id: 10,
+    name: "The Flying Dutchman Nautical Opera",
+    description: "A water-based production of Wagner’s 'The Flying Dutchman', performed on a floating stage.",
+    startDate: "2025-11-01",
+    endDate: "2026-04-15",
+  },
+];
+
+
+const mockTasks: Task[] = [
+  { id: 1, title: "Setup database", description: "Initialize MySQL schema", status: Status.ToDo, priority: Priority.High, projectId: 1, authorUserId: 1, assignedUserId: 2, startDate: "2025-01-10", dueDate: "2025-02-01" },
+  { id: 2, title: "Build React UI", description: "Design the front-end for the admin panel", status: Status.WorkInProgress, priority: Priority.Medium, projectId: 1, authorUserId: 2, assignedUserId: 1, startDate: "2025-02-01", dueDate: "2025-03-01" },
+  { id: 3, title: "API Development", description: "Develop RESTful APIs", status: Status.UnderReview, priority: Priority.Urgent, projectId: 1, authorUserId: 3, assignedUserId: 4, startDate: "2025-01-20", dueDate: "2025-02-15" },
+  { id: 4, title: "User Authentication", description: "Implement OAuth and JWT", status: Status.Completed, priority: Priority.High, projectId: 2, authorUserId: 2, assignedUserId: 3, startDate: "2025-02-10", dueDate: "2025-03-05" },
+  { id: 5, title: "Automate Light Configurations", description: "Develop smart light patterns", status: Status.ToDo, priority: Priority.Low, projectId: 3, authorUserId: 4, assignedUserId: 1, startDate: "2024-12-01", dueDate: "2025-04-01" },
+];
+
+const mockTeams: Team[] = [
+  { teamId: 1, teamName: "Dev Team", productOwnerUserId: 1, projectManagerUserId: 2 },
+  { teamId: 2, teamName: "QA Team", productOwnerUserId: 3, projectManagerUserId: 4 },
+];
+
+// === API ENDPOINTS (FAKE) ===
 export const api = createApi({
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-    prepareHeaders: async (headers) => {
-      const session = await fetchAuthSession();
-      const { accessToken } = session.tokens ?? {};
-      if (accessToken) {
-        headers.set("Authorization", `Bearer ${accessToken}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: fakeBaseQuery(),
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
-    getAuthUser: build.query({
-      queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
-        try {
-          const user = await getCurrentUser();
-          const session = await fetchAuthSession();
-          if (!session) throw new Error("No session found");
-          const { userSub } = session;
-          const { accessToken } = session.tokens ?? {};
-
-          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
-          const userDetails = userDetailsResponse.data as User;
-
-          return { data: { user, userSub, userDetails } };
-        } catch (error: any) {
-          return { error: error.message || "Could not fetch user data" };
-        }
+    getAuthUser: build.query<User, void>({
+      queryFn: async () => {
+        return { data: mockUsers[0] }; // Trả về user đầu tiên
       },
     }),
     getProjects: build.query<Project[], void>({
-      query: () => "projects",
-      providesTags: ["Projects"],
+      queryFn: async () => {
+        return { data: mockProjects };
+      },
     }),
     createProject: build.mutation<Project, Partial<Project>>({
-      query: (project) => ({
-        url: "projects",
-        method: "POST",
-        body: project,
-      }),
-      invalidatesTags: ["Projects"],
+      queryFn: async (project) => {
+        const newProject = { ...project, id: mockProjects.length + 1 } as Project;
+        mockProjects.push(newProject);
+        return { data: newProject };
+      },
     }),
     getTasks: build.query<Task[], { projectId: number }>({
-      query: ({ projectId }) => `tasks?projectId=${projectId}`,
-      providesTags: (result) =>
-        result
-          ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
-          : [{ type: "Tasks" as const }],
+      queryFn: async ({ projectId }) => {
+        return { data: mockTasks.filter((task) => task.projectId === projectId) };
+      },
     }),
     getTasksByUser: build.query<Task[], number>({
-      query: (userId) => `tasks/user/${userId}`,
-      providesTags: (result, error, userId) =>
-        result
-          ? result.map(({ id }) => ({ type: "Tasks", id }))
-          : [{ type: "Tasks", id: userId }],
+      queryFn: async (userId) => {
+        return { data: mockTasks.filter((task) => task.assignedUserId === userId) };
+      },
     }),
     createTask: build.mutation<Task, Partial<Task>>({
-      query: (task) => ({
-        url: "tasks",
-        method: "POST",
-        body: task,
-      }),
-      invalidatesTags: ["Tasks"],
+      queryFn: async (task) => {
+        const newTask = { ...task, id: mockTasks.length + 1 } as Task;
+        mockTasks.push(newTask);
+        return { data: newTask };
+      },
     }),
     updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
-      query: ({ taskId, status }) => ({
-        url: `tasks/${taskId}/status`,
-        method: "PATCH",
-        body: { status },
-      }),
-      invalidatesTags: (result, error, { taskId }) => [
-        { type: "Tasks", id: taskId },
-      ],
+      queryFn: async ({ taskId, status }) => {
+        const taskIndex = mockTasks.findIndex((t) => t.id === taskId);
+        if (taskIndex === -1) return { error: "Task not found" };
+        mockTasks[taskIndex].status = status as Status;
+        return { data: mockTasks[taskIndex] };
+      },
     }),
     getUsers: build.query<User[], void>({
-      query: () => "users",
-      providesTags: ["Users"],
+      queryFn: async () => {
+        return { data: mockUsers };
+      },
     }),
     getTeams: build.query<Team[], void>({
-      query: () => "teams",
-      providesTags: ["Teams"],
+      queryFn: async () => {
+        return { data: mockTeams };
+      },
     }),
     search: build.query<SearchResults, string>({
-      query: (query) => `search?query=${query}`,
+      queryFn: async (query) => {
+        const filteredUsers = mockUsers.filter((u) =>
+          u.username.toLowerCase().includes(query.toLowerCase())
+        );
+        const filteredProjects = mockProjects.filter((p) =>
+          p.name.toLowerCase().includes(query.toLowerCase())
+        );
+        const filteredTasks = mockTasks.filter((t) =>
+          t.title.toLowerCase().includes(query.toLowerCase())
+        );
+
+        return {
+          data: { users: filteredUsers, projects: filteredProjects, tasks: filteredTasks },
+        };
+      },
     }),
   }),
 });

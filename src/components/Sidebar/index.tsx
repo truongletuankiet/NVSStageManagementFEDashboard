@@ -75,7 +75,8 @@ const Sidebar = () => {
         {/* TEAM */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
-            src="https://pm-s3-images.s3.us-east-2.amazonaws.com/logo.png"
+            src="https://scontent.fsgn1-1.fna.fbcdn.net/v/t51.75761-15/479664489_18269283460267118_7806812783160013818_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFmakzQTC3mdqB-myuvpJaJz5OeKA82ptLPk54oDzam0gP77QhdxcBLr386bEB_wYXHP3hd0QoNOlDGJaFhBtu2&_nc_ohc=RaK97tH62jwQ7kNvgG0ObE7&_nc_oc=Adj5EmDIraTRP-Qfi4sGERRxmkm7dIpzqNCc37slFejBdz-FRRSiwGDMbx9leNiJYjs&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=AJ1Ae5hP8JRla3mROUbJ1Le&oh=00_AYBZihdvztEeMFwzBGhTXmCrTtcgOgfI3Om1BKe9mWnOAw&oe=67BCF429"
+            // src="https://pm-s3-images.s3.us-east-2.amazonaws.com/logo.png"
             alt="Logo"
             width={40}
             height={40}
@@ -93,6 +94,7 @@ const Sidebar = () => {
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
+          <SidebarLink icon={Home} label="Home of Admin" href="/concertmaster" />
           <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
           <SidebarLink icon={Search} label="Search" href="/search" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />
