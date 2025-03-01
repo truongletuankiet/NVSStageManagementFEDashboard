@@ -1,4 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { mockUsers as mockUsersArray } from "../../public/mockUsers";
 
 export interface Project {
   id: number;
@@ -24,15 +25,22 @@ export enum Status {
 }
 
 export interface User {
-  userId?: number;
-  username: string;
-  fullname: string;
+  id: string;
+  fullName: string;
+  dayOfBirth: string;
   email: string;
-  userDetails?: string;
-  profilePictureUrl?: string;
-  cognitoId?: string;
-  teamId?: number;
+  password: string;
+  department: {
+    id: string;
+    name: string;
+    description: string | null;
+  };
+  pictureProfile?: string | null;
+  createDate: string;
+  roleID: string;
+  status: string;
 }
+
 
 export interface Attachment {
   id: number;
@@ -84,18 +92,7 @@ const mockTeams: Team[] = [
   { teamId: 5, teamName: "Resource and Equipment Management" },
 ];
 
-const mockUsers: User[] = [
-  { userId: 1, username: "nguyenvanminh", fullname: "PGS.TS. Nguyễn Văn Minh", email: "nguyenvanminh@example.com", userDetails: "Dean of Vietnamese Traditional Music", teamId: 1 },
-  { userId: 2, username: "lethihonglien", fullname: "TS. Lê Thị Hồng Liên", email: "lethihonglien@example.com", userDetails: "Expert in đàn Tranh", teamId: 1 },
-  { userId: 3, username: "tranquochung", fullname: "ThS. Trần Quốc Hùng", email: "tranquochung@example.com", userDetails: "Expert in đàn Bầu", teamId: 1 },
-  { userId: 4, username: "phamngocdung", fullname: "ThS. Phạm Ngọc Dũng", email: "phamngocdung@example.com", userDetails: "Expert in đàn Nhị", teamId: 1 },
-  { userId: 5, username: "buithanhbinh", fullname: "NSƯT. Bùi Thanh Bình", email: "buithanhbinh@example.com", userDetails: "Expert in Southern ceremonial music", teamId: 1 },
-  { userId: 6, username: "tranmanhtuan", fullname: "GS.TS. Trần Mạnh Tuấn", email: "tranmanhtuan@example.com", userDetails: "Dean of Western Musical Instruments", teamId: 2 },
-  { userId: 7, username: "nguyenquochung", fullname: "TS. Nguyễn Quốc Hùng", email: "nguyenquochung@example.com", userDetails: "Piano Expert", teamId: 2 },
-  { userId: 8, username: "phamduykhanh", fullname: "ThS. Phạm Duy Khánh", email: "phamduykhanh@example.com", userDetails: "Violin Expert", teamId: 2 },
-  { userId: 9, username: "trinhhoaian", fullname: "ThS. Trịnh Hoài An", email: "trinhhoaian@example.com", userDetails: "Cello Expert", teamId: 2 },
-  { userId: 10, username: "lethanhphong", fullname: "NSƯT. Lê Thanh Phong", email: "lethanhphong@example.com", userDetails: "Guitar Expert", teamId: 2 },
-];
+const mockUsers: User[] = mockUsersArray;
 
 const mockProjects: Project[] = [
   {
@@ -249,7 +246,7 @@ export const api = createApi({
     search: build.query<SearchResults, string>({
       queryFn: async (query) => {
         const filteredUsers = mockUsers.filter((u) =>
-          u.username.toLowerCase().includes(query.toLowerCase())
+          u.id.toLowerCase().includes(query.toLowerCase())
         );
         const filteredProjects = mockProjects.filter((p) =>
           p.name.toLowerCase().includes(query.toLowerCase())

@@ -59,7 +59,7 @@ const Sidebar = () => {
         {/* TOP LOGO */}
         <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
           <div className="text-xl font-bold text-gray-800 dark:text-white">
-            EDLIST
+          HCMCONS
           </div>
           {isSidebarCollapsed ? null : (
             <button
@@ -75,15 +75,16 @@ const Sidebar = () => {
         {/* TEAM */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
-            src="https://scontent.fsgn1-1.fna.fbcdn.net/v/t51.75761-15/479664489_18269283460267118_7806812783160013818_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFmakzQTC3mdqB-myuvpJaJz5OeKA82ptLPk54oDzam0gP77QhdxcBLr386bEB_wYXHP3hd0QoNOlDGJaFhBtu2&_nc_ohc=RaK97tH62jwQ7kNvgG0ObE7&_nc_oc=Adj5EmDIraTRP-Qfi4sGERRxmkm7dIpzqNCc37slFejBdz-FRRSiwGDMbx9leNiJYjs&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=AJ1Ae5hP8JRla3mROUbJ1Le&oh=00_AYBZihdvztEeMFwzBGhTXmCrTtcgOgfI3Om1BKe9mWnOAw&oe=67BCF429"
-            // src="https://pm-s3-images.s3.us-east-2.amazonaws.com/logo.png"
+            src="https://scontent.fsgn1-1.fna.fbcdn.net/v/t39.30808-6/476450745_1016467233655474_8915782888244074_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEjQXSz-Gwwbb-Vjk3zSScRjhQORqcmw8iOFA5GpybDyPcPeWj11JpUVb5u66Rr4BE_WQMs5uImuONbWOJzsU_z&_nc_ohc=7nMfn4Hef7MQ7kNvgFavNzB&_nc_oc=Adh1BZYAthEzoRiTxyhvgTV1pXLzH5Rk-YRrUMxLmSQQ7Fpexz_4IJIda8QqlAegUZQ&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=A64KLm7H49k0mfTSVSTJeZO&oh=00_AYBXeMQPJ_3cgW6lvRNDR2i9lkivCx23ZYGgK4QTJoDmSg&oe=67C8B5B9"
+            // src="https://upload.wikimedia.org/wikipedia/vi/thumb/c/c4/HCMCONS_Logo.svg/484px-HCMCONS_Logo.svg.png"
+            // src="../../public/logo.png"
             alt="Logo"
             width={40}
             height={40}
           />
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-              EDROH TEAM
+              CONCERT MASTER
             </h3>
             <div className="mt-1 flex items-start gap-2">
               <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
