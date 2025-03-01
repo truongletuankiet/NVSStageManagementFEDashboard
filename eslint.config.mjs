@@ -1,16 +1,17 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import type { NextConfig } from "next";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const nextConfig: NextConfig = {
+//   /* config options here */
+// };
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ["pm-s3-images.s3.us-east-2.amazonaws.com", "scontent.fsgn1-1.fna.fbcdn.net", "upload.wikimedia.org"] // Thêm domain Facebook
+  },
+};
 
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
+module.exports = nextConfig;
 
-export default eslintConfig;
+
+export default nextConfig;
