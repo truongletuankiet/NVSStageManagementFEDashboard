@@ -46,7 +46,7 @@ const Sidebar = () => {
     }
   };
   if (!currentUser) return null;
-  const currentUserDetails = currentUser?.userDetails;
+  const currentUserDetails = currentUser;
 
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
     transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
@@ -76,8 +76,6 @@ const Sidebar = () => {
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
             src="https://scontent.fsgn1-1.fna.fbcdn.net/v/t39.30808-6/476450745_1016467233655474_8915782888244074_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEjQXSz-Gwwbb-Vjk3zSScRjhQORqcmw8iOFA5GpybDyPcPeWj11JpUVb5u66Rr4BE_WQMs5uImuONbWOJzsU_z&_nc_ohc=7nMfn4Hef7MQ7kNvgFavNzB&_nc_oc=Adh1BZYAthEzoRiTxyhvgTV1pXLzH5Rk-YRrUMxLmSQQ7Fpexz_4IJIda8QqlAegUZQ&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=A64KLm7H49k0mfTSVSTJeZO&oh=00_AYBXeMQPJ_3cgW6lvRNDR2i9lkivCx23ZYGgK4QTJoDmSg&oe=67C8B5B9"
-            // src="https://upload.wikimedia.org/wikipedia/vi/thumb/c/c4/HCMCONS_Logo.svg/484px-HCMCONS_Logo.svg.png"
-            // src="../../public/logo.png"
             alt="Logo"
             width={40}
             height={40}
@@ -167,10 +165,10 @@ const Sidebar = () => {
       <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
         <div className="flex w-full items-center">
           <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
+            {!!currentUserDetails?.pictureProfile ? (
               <Image
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
+                src={`https://scontent.fsgn1-1.fna.fbcdn.net/v/t39.30808-6/476450745_1016467233655474_8915782888244074_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEjQXSz-Gwwbb-Vjk3zSScRjhQORqcmw8iOFA5GpybDyPcPeWj11JpUVb5u66Rr4BE_WQMs5uImuONbWOJzsU_z&_nc_ohc=7nMfn4Hef7MQ7kNvgFavNzB&_nc_oc=Adh1BZYAthEzoRiTxyhvgTV1pXLzH5Rk-YRrUMxLmSQQ7Fpexz_4IJIda8QqlAegUZQ&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=A64KLm7H49k0mfTSVSTJeZO&oh=00_AYBXeMQPJ_3cgW6lvRNDR2i9lkivCx23ZYGgK4QTJoDmSg&oe=67C8B5B9`}
+                alt={currentUserDetails?.fullName || "User Profile Picture"}
                 width={100}
                 height={50}
                 className="h-full rounded-full object-cover"
@@ -180,7 +178,7 @@ const Sidebar = () => {
             )}
           </div>
           <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
+            {currentUserDetails?.id}
           </span>
           <button
             className="self-start rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"

@@ -1,8 +1,22 @@
 "use client";
+import { useState } from "react";
 import { useGetTeamsQuery } from "@/state/api";
 import React from "react";
-import { useAppSelector } from "../redux";
-import Header from "@/components/Header";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
+  Tooltip,
+  Box,
+  Stack,
+} from "@mui/material";
+import { Edit, Delete, MoreVert } from "@mui/icons-material";
 import {
   DataGrid,
   GridColDef,
@@ -10,49 +24,133 @@ import {
   GridToolbarExport,
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
-import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
+import Header from "@/components/Header";
 
 const CustomToolbar = () => (
-  <GridToolbarContainer className="toolbar flex gap-2">
+  <GridToolbarContainer>
     <GridToolbarFilterButton />
     <GridToolbarExport />
   </GridToolbarContainer>
 );
 
-const columns: GridColDef[] = [
-  { field: "teamId", headerName: "Team ID", width: 100 },
-  { field: "teamName", headerName: "Team Name", width: 200 },
-  { field: "productOwnerUsername", headerName: "Product Owner", width: 200 },
-  {
-    field: "projectManagerUsername",
-    headerName: "Project Manager",
-    width: 200,
-  },
-];
-
 const Teams = () => {
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError || !teams) return <div>Error fetching teams</div>;
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, team: any) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedTeam(team);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedTeam(null);
+  };
+
+  if (isLoading)
+    return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Loading...</Box>;
+  if (isError || !teams)
+    return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Error fetching teams</Box>;
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 100, headerAlign: "center", align: "center" },
+    {
+      field: "name",
+      headerName: "Department",
+      width: 250,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Stack direction="row" spacing={2} alignItems="center" width="100%">
+          <Avatar alt={params.value} src={params.row.avatar} sx={{ width: 32, height: 32 }} />
+          <Typography variant="body1" fontWeight="bold" color="primary">
+            {params.value}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      field: "dean",
+      headerName: "Dean",
+      width: 250,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Stack>
+          <Typography variant="body1" fontWeight="bold" color="primary">
+            {params.value?.fullName || "N/A"}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            {params.value?.email || "N/A"}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 300,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography variant="body2" color="textSecondary" noWrap>
+          {params.value || "N/A"}
+        </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      width: 100,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      renderCell: (params) => (
+        <Tooltip title="More actions">
+          <IconButton onClick={(event) => handleMenuOpen(event, params.row)}>
+            <MoreVert />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
+  ];
 
   return (
-    <div className="flex w-full flex-col p-8">
+    <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
       <Header name="Teams" />
-      <div style={{ height: 650, width: "100%" }}>
-        <DataGrid
-          rows={teams || []}
-          columns={columns}
-          pagination
-          getRowId={(row) => row.teamId} // Đảm bảo mỗi hàng có id duy nhất
-          slots={{
-            toolbar: CustomToolbar,
-          }}
-          className={dataGridClassNames}
-          sx={dataGridSxStyles(isDarkMode)}
-        />
-      </div>
+      <DataGrid
+        rows={teams}
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination
+        slots={{ toolbar: CustomToolbar }}
+        sx={{
+          "& .MuiDataGrid-row:nth-of-type(odd)": { backgroundColor: "#FFFFFF" },
+          "& .MuiDataGrid-row:hover": { backgroundColor: "#e3f2fd" },
+          "& .MuiDataGrid-columnHeaders": {
+            bgcolor: "#2196F3",
+            color: "black",
+            fontWeight: "700 !important",
+            fontSize: "1rem",
+            textTransform: "uppercase",
+          },
+          "& .MuiDataGrid-cell": { display: "flex", justifyContent: "center", alignItems: "center" },
+          width: "100%", maxWidth: 1200, p: 0, boxShadow: 4, borderRadius: 2, bgcolor: "#fafafa",
+        }}
+      />
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => alert(`Editing ${selectedTeam?.name}`)}>
+          <ListItemIcon>
+            <Edit fontSize="small" />
+          </ListItemIcon>
+          Edit
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => alert(`Deleting ${selectedTeam?.name}`)}>
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
+          <Typography color="error">Delete</Typography>
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

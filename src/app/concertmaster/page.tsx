@@ -24,6 +24,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { motion } from "framer-motion";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectHeader from "../projects/ProjectHeader";
@@ -95,11 +96,30 @@ const ConcertMaster = () => {
       };
 
   return (
-    <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container h-full w-[100%] bg-gray-100 bg-transparent p-8"
+    >
       <Header name="Dashboard of Concert Master" />
+      <motion.h2
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-2xl font-bold text-gray-700 dark:text-white text-center mb-6"
+      >
+        Welcome to Concert Master! 🎶
+      </motion.h2>
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary"
+        >
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Task Priority Distribution
           </h3>
@@ -111,18 +131,19 @@ const ConcertMaster = () => {
               />
               <XAxis dataKey="name" stroke={chartColors.text} />
               <YAxis stroke={chartColors.text} />
-              <Tooltip
-                contentStyle={{
-                  width: "min-content",
-                  height: "min-content",
-                }}
-              />
+              <Tooltip />
               <Legend />
               <Bar dataKey="count" fill={chartColors.bar} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary"
+        >
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Project Status
           </h3>
@@ -130,32 +151,34 @@ const ConcertMaster = () => {
             <PieChart>
               <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
                 {projectStatus.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
-        </div>
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2"
+        >
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             HCMC Conservatory Projects
           </h3>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
-            <h3 className="mb-4 text-lg font-semibold dark:text-white">Projects</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {projects.map((project) => (
+              <motion.div whileHover={{ scale: 1.05 }} key={project.id}>
+                <ProjectCard project={project} />
+              </motion.div>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

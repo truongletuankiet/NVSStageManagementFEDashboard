@@ -1,114 +1,136 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { mockUsers } from "../../public/mockUsers";
+import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import LoginForm from "./loginform";
+import "tailwindcss/tailwind.css";
 
-const AuthContext = createContext(null);
+const logo = "/HCMCONS_Logo.png";
+const backgroundMusic = "/music-bg.svg";
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+interface User {
+  email: string;
+  token: string;
+  roles: string[];
+}
+
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  register: (fullName: string, email: string, password: string, confirmPassword: string) => Promise<void>;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Kiểm tra localStorage để duy trì đăng nhập
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser: User = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Lỗi khi parse user từ localStorage", error);
+          localStorage.removeItem("user");
+        }
+      }
     }
     setLoading(false);
   }, []);
 
-  // Hàm đăng nhập giả lập bằng cách kiểm tra trong mockUsers
-  const login = async (email, password) => {
+  const login = async (email: string, password: string): Promise<void> => {
     setError(null);
-    const foundUser = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (foundUser) {
-      localStorage.setItem("user", JSON.stringify(foundUser));
-      setUser(foundUser);
-    } else {
-      setError("Email hoặc mật khẩu không đúng!");
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/user/login", { email, password });
+      const { token, roles } = response.data;
+      const userData: User = { email, token, roles };
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+    } catch (err) {
+      setError("Đăng nhập thất bại. Kiểm tra lại thông tin!");
     }
   };
 
-  const logout = () => {
+  const register = async (fullName: string, email: string, password: string, confirmPassword: string): Promise<void> => {
+    setError(null);
+    if (password !== confirmPassword) {
+      setError("Mật khẩu nhập lại không khớp!");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/user/register", {
+        fullName,
+        dayOfBirth: new Date().toISOString().split("T")[0],
+        email,
+        password,
+        department: null,
+        pictureProfile: "https://source.unsplash.com/100x100/?music",
+        createDate: new Date().toISOString(),
+        roleID: null,
+        status: "Active",
+      });
+      const userData: User = response.data;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+    } catch (err) {
+      setError("Đăng ký thất bại. Vui lòng thử lại!");
+    }
+  };
+
+  const logout = (): void => {
     localStorage.removeItem("user");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, register }}>
       {loading ? (
-        <div className="flex justify-center items-center min-h-screen">
-          <p className="text-lg">Đang tải...</p>
+        <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 animate-fadeIn">
+          <img src={logo} alt="Nhạc viện TP HCM" className="w-32 h-32 animate-pulse" />
+          <p className="text-lg text-gray-600">Đang tải...</p>
         </div>
       ) : user ? (
         children
       ) : (
-        <LoginForm login={login} error={error} />
+        <div
+          className="relative min-h-screen flex justify-center items-center bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${backgroundMusic})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-700 opacity-80"></div>
+          <div className="absolute top-10 left-10 animate-slideIn">
+            <img src={logo} alt="Nhạc viện TP HCM" className="w-24 h-24 shadow-lg rounded-full" />
+          </div>
+          <LoginForm
+            login={login}
+            register={register}
+            error={error}
+            setIsRegistering={setIsRegistering}
+            isRegistering={isRegistering}
+          />
+        </div>
       )}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth phải được sử dụng trong AuthProvider");
   }
   return context;
-};
-
-const LoginForm = ({ login, error }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    await login(email, password);
-    setLoading(false);
-  };
-
-  return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <form onSubmit={handleLogin} className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center">Đăng nhập</h2>
-
-          {error && <p className="text-red-500 text-center">{error}</p>}
-
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Mật khẩu"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
 };
 
 export default AuthProvider;

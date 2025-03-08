@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { BrowserRouter } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import AuthProvider from "./authProvider";
@@ -18,7 +19,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  });
+  }, [isDarkMode]); // Thêm dependency để tránh render liên tục
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
@@ -37,11 +38,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <StoreProvider>
-      <AuthProvider>
-        <DashboardLayout>{children}</DashboardLayout>
-      </AuthProvider>
-    </StoreProvider>
+    <BrowserRouter>
+      <StoreProvider>
+        <AuthProvider>
+          <DashboardLayout>{children}</DashboardLayout>
+        </AuthProvider>
+      </StoreProvider>
+    </BrowserRouter>
   );
 };
 
