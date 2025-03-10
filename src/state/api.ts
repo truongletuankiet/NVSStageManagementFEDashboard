@@ -1,5 +1,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { mockUsers as mockUsersArray } from "../../public/mockUsers";
+import axios from "axios";
 
 export interface Project {
   id: number;
@@ -37,7 +38,7 @@ export interface User {
   };
   pictureProfile?: string | null;
   createDate: string;
-  roleID: string;
+  role: string;
   status: string;
 }
 
@@ -336,32 +337,32 @@ export const api = createApi({
       queryFn: async () => {
         try {
           const storedUser = localStorage.getItem("user");
-    
           if (!storedUser) {
-            console.warn("No user found in localStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { data: null };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.email) {
-            console.warn("Invalid user data in localStorage.");
+            console.warn("⚠️ Invalid user data in localStorage.");
             return { data: null };
           }
-    
-          const userEmail = parsedUser.email;
-          console.log("Fetching user from API:", userEmail);
-    
-          const response = await fetch("http://localhost:8080/api/v1/user");
-          if (!response.ok) throw new Error("Failed to fetch users");
-    
-          const users: User[] = await response.json();
-          if (!Array.isArray(users)) throw new Error("Invalid user data format");
-    
-          const foundUser = users.find((user) => user.email === userEmail) || null;
-    
+
+          console.log("🔍 Fetching user from API:", parsedUser.email);
+
+          const response = await axios.get("http://localhost:8080/api/v1/user/get-all");
+          if (!response.data || response.data.code !== 1000) {
+            throw new Error("❌ Failed to fetch users");
+          }
+
+          const users: User[] = response.data.result;
+          if (!Array.isArray(users)) throw new Error("❌ Invalid user data format");
+
+          const foundUser = users.find((user) => user.email === parsedUser.email) || null;
+
           return { data: foundUser };
         } catch (error) {
-          console.error("Error fetching auth user:", error);
+          console.error("❌ Error fetching auth user:", error);
           return { error: error instanceof Error ? error.message : "Unknown error" };
         }
       },
@@ -414,15 +415,30 @@ export const api = createApi({
     getUsers: build.query<User[], void>({
       queryFn: async () => {
         try {
-          const response = await fetch("http://localhost:8080/api/v1/user");
-          if (!response.ok) throw new Error("Failed to fetch users");
-          const users: User[] = await response.json();
+          console.log("🔍 Fetching all users from API...");
+    
+          const response = await axios.get("http://localhost:8080/api/v1/user/get-all");
+    
+          if (!response.data || response.data.code !== 1000) {
+            console.error("❌ Failed to fetch users. Response:", response.data);
+            throw new Error("Failed to fetch users");
+          }
+    
+          const users: User[] = response.data.result;
+    
+          if (!Array.isArray(users)) {
+            throw new Error("❌ Invalid user data format");
+          }
+    
+          console.log(`✅ Successfully fetched ${users.length} users`);
           return { data: users };
         } catch (error) {
-          return { error: error.message };
+          console.error("❌ Error fetching users:", error);
+          return { error: error instanceof Error ? error.message : "Unknown error" };
         }
       },
     }),
+    
 
     // getUsers: build.query<User[], void>({
     //   queryFn: async () => {

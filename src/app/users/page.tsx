@@ -119,7 +119,7 @@ const Users = () => {
       renderCell: (params) => <Typography>{params.value?.name || "N/A"}</Typography>,
     },
     {
-      field: "roleID",
+      field: "role",
       headerName: "ROLE",
       width: 150,
       headerAlign: "center",

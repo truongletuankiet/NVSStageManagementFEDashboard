@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/user/login", { email, password });
+      const response = await axios.post("http://localhost:8080/auth/token", { email, password });
       const { token, roles } = response.data;
       const userData: User = { email, token, roles };
       localStorage.setItem("user", JSON.stringify(userData));
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         department: null,
         pictureProfile: "https://source.unsplash.com/100x100/?music",
         createDate: new Date().toISOString(),
-        roleID: null,
+        role: null,
         status: "Active",
       });
       const userData: User = response.data;
