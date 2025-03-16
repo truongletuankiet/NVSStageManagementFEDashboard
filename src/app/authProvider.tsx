@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);
     try {
-        const response = await axios.post("http://localhost:8080/auth/token", { email, password });
+        const response = await axios.post("http://localhost:8080/api/v1/auth/token", { email, password });
 
         if (!response.data || !response.data.result?.token) {
             throw new Error("❌ Đăng nhập thất bại. Phản hồi API không hợp lệ!");

@@ -25,21 +25,19 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const progress = getRandomProgress();
 
   return (
-    <div className="relative w-80 rounded-lg border bg-white shadow-lg overflow-hidden">
-      {/* Background Image & Menu */}
-      <div
-        className="h-32 bg-cover bg-center relative"
-        style={{ backgroundImage: `url('${randomImage}')` }}
-      >
+    <div className="relative w-80 rounded-lg bg-[#1E1F36] shadow-lg overflow-hidden p-4">
+      {/* Background Image */}
+      <div className="relative w-full h-32 rounded-lg overflow-hidden">
+        <img src={randomImage} alt="Project" className="w-full h-full object-cover" />
         <div className="absolute top-3 right-3 bg-white p-1 rounded-full shadow">
           <MoreHorizontal className="h-5 w-5 text-gray-600" />
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900">{project.title}</h3>
-        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{project.description}</p>
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold text-white">{project.title}</h3>
+        <p className="text-sm text-gray-400 mt-1 line-clamp-2">{project.description}</p>
 
         {/* Created Date */}
         <div className="mt-3 flex items-center text-sm text-gray-500">
@@ -49,13 +47,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
 
         {/* Progress Bar */}
         <div className="mt-4">
-          <div className="flex justify-between text-xs font-medium text-gray-600">
-            <span>Progress</span>
+          <div className="flex justify-between text-xs font-medium text-gray-400">
+            <span>Tasks</span>
             <span>{progress}%</span>
           </div>
-          <div className="mt-1 h-2 w-full bg-gray-200 rounded-full">
+          <div className="mt-1 h-2 w-full bg-gray-700 rounded-full">
             <div
-              className="h-full bg-blue-500 rounded-full"
+              className="h-full bg-blue-400 rounded-full"
               style={{ width: `${progress}%` }}
             ></div>
           </div>
@@ -68,11 +66,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
               key={index}
               src={avatar}
               alt="Member"
-              className="h-8 w-8 rounded-full border-2 border-white -ml-2 first:ml-0"
+              className="h-8 w-8 rounded-full border-2 border-[#1E1F36] -ml-2 first:ml-0"
             />
           ))}
           {dummyMembers.length > 3 && (
-            <span className="ml-2 text-sm text-gray-500">+{dummyMembers.length - 3}</span>
+            <span className="ml-2 text-sm text-gray-400">+{dummyMembers.length - 3}</span>
           )}
         </div>
       </div>

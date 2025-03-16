@@ -62,7 +62,7 @@ const Teams = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <Stack direction="row" spacing={2} alignItems="center" width="100%">
-          <Avatar alt={params.value} src={params.row.avatar} sx={{ width: 32, height: 32 }} />
+          {/* <Avatar alt={params.value} src={params.row.avatar} sx={{ width: 32, height: 32 }} /> */}
           <Typography variant="body1" fontWeight="bold" color="primary">
             {params.value}
           </Typography>
@@ -74,17 +74,28 @@ const Teams = () => {
       headerName: "Dean",
       width: 250,
       headerAlign: "center",
-      renderCell: (params) => (
-        <Stack>
-          <Typography variant="body1" fontWeight="bold" color="primary">
-            {params.value?.fullName || "N/A"}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {params.value?.email || "N/A"}
-          </Typography>
-        </Stack>
-      ),
-    },
+      renderCell: (params) => {
+        const firstUser = params.row.users?.[0]; // Lấy user đầu tiên
+        return (
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar
+              alt={firstUser?.fullName}
+              src={firstUser?.pictureProfile || "/default-avatar.png"} // Thêm ảnh mặc định nếu không có
+              sx={{ width: 40, height: 40 }}
+            />
+            <Stack>
+              <Typography variant="body1" fontWeight="bold" color="primary">
+                {firstUser?.fullName || "N/A"}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                {firstUser?.email || "N/A"}
+              </Typography>
+            </Stack>
+          </Stack>
+        );
+      },
+    },    
+    
     {
       field: "description",
       headerName: "Description",

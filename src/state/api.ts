@@ -32,7 +32,7 @@ export enum Status {
 export interface User {
   id: string;
   fullName: string;
-  dayOfBirth: string;
+  dayOfBirth: string | null;
   email: string;
   password: string;
   department: {
@@ -42,9 +42,17 @@ export interface User {
   };
   pictureProfile?: string | null;
   createDate: string;
-  role: string;
+  role: {
+    id: number;
+    roleName: string;
+  };
   status: string;
+  taskUsers: {
+    taskID: string;
+    userID: string | null;
+  }[];
 }
+
 
 export interface Attachment {
   id: number;
@@ -81,9 +89,10 @@ export interface SearchResults {
 }
 
 export interface Team {
-  id: number;
+  id: string;
   name: string;
   description?: string;
+  users: User[];
 }
 
 // === MOCK DATA ===
@@ -501,16 +510,47 @@ export const api = createApi({
     
     
 
-    // getUsers: build.query<User[], void>({
-    //   queryFn: async () => {
-    //     return { data: mockUsers };
-    //   },
-    // }),
     getTeams: build.query<Team[], void>({
       queryFn: async () => {
-        return { data: mockTeams };
+        try {
+          console.log("🔍 Fetching all teams from API...");
+    
+          // 🛑 Lấy token từ sessionStorage
+          const storedUser = sessionStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in sessionStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+    
+          // 🔥 Gửi request có kèm token
+          const response = await fetch("http://localhost:8080/api/v1/departments", {
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`,
+              "Content-Type": "application/json",
+            },
+          });
+    
+          if (!response.ok) {
+            throw new Error("Failed to fetch teams");
+          }
+    
+          const data = await response.json();
+          console.log(`✅ Successfully fetched ${data.length} teams`);
+          return { data };
+        } catch (error) {
+          console.error("❌ Error fetching teams:", error);
+          return { error: { status: "FETCH_ERROR", message: error.message } };
+        }
       },
     }),
+    
+
     search: build.query<SearchResults, string>({
       queryFn: async (query) => {
         const filteredUsers = mockUsers.filter((u) =>

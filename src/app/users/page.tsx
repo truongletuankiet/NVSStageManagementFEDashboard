@@ -125,22 +125,23 @@ const Users = () => {
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
-        const { bg, text } = getRoleColor(params.value);
+        const roleName = params.value?.roleName || "Unknown"; // Đảm bảo không bị lỗi undefined
+        const { bg, text } = getRoleColor(roleName);
         return (
           <Chip
-            label={params.value}
+            label={roleName}
             sx={{
               backgroundColor: bg,
               color: text,
               fontSize: "10px",
               fontWeight: "bold",
-              borderRadius: "3px", // Giảm border-radius
-              border: "none", // Xóa border
-              padding: "0px", // Giảm padding xuống mức tối thiểu
-              minHeight: "16px", // Thu nhỏ chiều cao tối đa
+              borderRadius: "3px",
+              border: "none",
+              padding: "0px",
+              minHeight: "16px",
               height: "16px",
               "& .MuiChip-label": {
-                padding: "0px 4px", 
+                padding: "0px 4px",
               },
             }}
           />
