@@ -3,12 +3,16 @@ import { mockUsers as mockUsersArray } from "../../public/mockUsers";
 import axios from "axios";
 
 export interface Project {
-  id: number;
-  name: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
+  projectID: string;   // ID của dự án (UUID)
+  title: string;       // Tên dự án
+  description?: string; // Mô tả dự án (có thể null)
+  content?: string;    // Nội dung chi tiết (có thể null)
+  startTime: string;   // Thời gian bắt đầu (ISO String)
+  endTime: string;     // Thời gian kết thúc (ISO String)
+  department?: string; // Thông tin phòng ban (hiện tại API trả về "[]", có thể null)
+  createdBy: string;   // Người tạo dự án
 }
+
 
 export enum Priority {
   Urgent = "Urgent",
@@ -336,43 +340,84 @@ export const api = createApi({
     getAuthUser: build.query<User | null, void>({
       queryFn: async () => {
         try {
-          const storedUser = localStorage.getItem("user");
+          const storedUser = sessionStorage.getItem("user");
           if (!storedUser) {
-            console.warn("⚠️ No user found in localStorage.");
+            console.warn("⚠️ No user found in sessionStorage.");
             return { data: null };
           }
-
+    
           const parsedUser = JSON.parse(storedUser);
-          if (!parsedUser?.email) {
-            console.warn("⚠️ Invalid user data in localStorage.");
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
             return { data: null };
           }
-
-          console.log("🔍 Fetching user from API:", parsedUser.email);
-
-          const response = await axios.get("http://localhost:8080/api/v1/user/get-all");
+    
+          console.log("🔍 Fetching authenticated user info...");
+    
+          const response = await axios.get("http://localhost:8080/api/v1/user/my-info", {
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
+            },
+          });
+    
           if (!response.data || response.data.code !== 1000) {
-            throw new Error("❌ Failed to fetch users");
+            throw new Error("❌ Failed to fetch authenticated user");
           }
-
-          const users: User[] = response.data.result;
-          if (!Array.isArray(users)) throw new Error("❌ Invalid user data format");
-
-          const foundUser = users.find((user) => user.email === parsedUser.email) || null;
-
-          return { data: foundUser };
+    
+          const user: User = response.data.result;
+          console.log(`✅ Successfully fetched authenticated user: ${user.fullName}`);
+    
+          return { data: user };
         } catch (error) {
-          console.error("❌ Error fetching auth user:", error);
+          console.error("❌ Error fetching authenticated user:", error);
           return { error: error instanceof Error ? error.message : "Unknown error" };
         }
       },
     }),
     
+    
     getProjects: build.query<Project[], void>({
       queryFn: async () => {
-        return { data: mockProjects };
+        try {
+          console.log("🔍 Fetching all projects from API...");
+    
+          // 🛑 Lấy token từ sessionStorage
+          const storedUser = sessionStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in sessionStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+    
+          // 🔥 Gửi request có kèm token
+          const response = await axios.get("http://localhost:8080/api/v1/project", {
+            headers: { Authorization: `Bearer ${parsedUser.token}` },
+          });
+    
+          if (!response.data) {
+            console.error("❌ Failed to fetch projects. Response:", response.data);
+            throw new Error("Failed to fetch projects");
+          }
+    
+          const projects: Project[] = response.data;
+          if (!Array.isArray(projects)) {
+            throw new Error("❌ Invalid project data format");
+          }
+    
+          console.log(`✅ Successfully fetched ${projects.length} projects`);
+          return { data: projects };
+        } catch (error) {
+          console.error("❌ Error fetching projects:", error);
+          return { error: error instanceof Error ? error.message : "Unknown error" };
+        }
       },
     }),
+    
     createProject: build.mutation<Project, Partial<Project>>({
       queryFn: async (project) => {
         const newProject = {
@@ -417,7 +462,23 @@ export const api = createApi({
         try {
           console.log("🔍 Fetching all users from API...");
     
-          const response = await axios.get("http://localhost:8080/api/v1/user/get-all");
+          // 🛑 Lấy token từ sessionStorage
+          const storedUser = sessionStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in sessionStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+    
+          // 🔥 Gửi request có kèm token
+          const response = await axios.get("http://localhost:8080/api/v1/user/get-all", {
+            headers: { Authorization: `Bearer ${parsedUser.token}` },
+          });
     
           if (!response.data || response.data.code !== 1000) {
             console.error("❌ Failed to fetch users. Response:", response.data);
@@ -425,7 +486,6 @@ export const api = createApi({
           }
     
           const users: User[] = response.data.result;
-    
           if (!Array.isArray(users)) {
             throw new Error("❌ Invalid user data format");
           }
@@ -438,6 +498,7 @@ export const api = createApi({
         }
       },
     }),
+    
     
 
     // getUsers: build.query<User[], void>({

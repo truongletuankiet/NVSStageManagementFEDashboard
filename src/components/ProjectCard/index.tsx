@@ -39,7 +39,7 @@ const ProjectCard = ({ project }: Props) => {
 
           {/* Project Name */}
           <h3 className="absolute bottom-2 left-4 text-lg font-bold text-white drop-shadow-lg">
-            {project.name}
+            {project.title}
           </h3>
         </div>
 
@@ -50,11 +50,11 @@ const ProjectCard = ({ project }: Props) => {
           <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
             <p className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-blue-600" />
-              {project.startDate}
+              {project.startTime}
             </p>
             <p className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-purple-600" />
-              {project.endDate}
+              {project.endTime}
             </p>
           </div>
         </div>

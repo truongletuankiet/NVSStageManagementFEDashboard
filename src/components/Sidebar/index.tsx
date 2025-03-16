@@ -37,7 +37,7 @@ const Sidebar = () => {
     (state) => state.global.isSidebarCollapsed,
   );
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser } = useGetAuthUserQuery();
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -117,10 +117,10 @@ const Sidebar = () => {
         {showProjects &&
           projects?.map((project) => (
             <SidebarLink
-              key={project.id}
+              key={project.projectID}
               icon={Briefcase}
-              label={project.name}
-              href={`/projects/${project.id}`}
+              label={project.title}
+              href={`/projects/${project.projectID}`}
             />
           ))}
 

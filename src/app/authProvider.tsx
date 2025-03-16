@@ -52,15 +52,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);
     try {
-      const response = await axios.post("http://localhost:8080/auth/token", { email, password });
-      const { token, roles } = response.data;
-      const userData: User = { email, token, roles };
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
+        const response = await axios.post("http://localhost:8080/auth/token", { email, password });
+
+        if (!response.data || !response.data.result?.token) {
+            throw new Error("❌ Đăng nhập thất bại. Phản hồi API không hợp lệ!");
+        }
+
+        const { token } = response.data.result; 
+        const userData: User = { email, token };
+
+        // ✅ Lưu vào sessionStorage thay vì localStorage
+        sessionStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+
+        // ✅ Cấu hình token cho axios
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        console.log("✅ Đăng nhập thành công:", userData);
     } catch (err) {
-      setError("Đăng nhập thất bại. Kiểm tra lại thông tin!");
+        console.error("❌ Lỗi đăng nhập:", err);
+        setError("Đăng nhập thất bại. Kiểm tra lại thông tin!");
     }
-  };
+};
+
 
   const register = async (fullName: string, email: string, password: string, confirmPassword: string): Promise<void> => {
     setError(null);
