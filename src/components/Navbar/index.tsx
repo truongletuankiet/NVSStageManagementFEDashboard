@@ -6,6 +6,7 @@ import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery } from "@/state/api";
 import Image from "next/image";
 import Modal from "../Modal";
+import ProfileDropdown from "../ProfileDropdown";
 import { motion, AnimatePresence } from "framer-motion"; // Import animation
 
 const Navbar = () => {
@@ -70,7 +71,7 @@ const Navbar = () => {
             <div className="flex h-9 w-9 justify-center">
               {currentUser?.pictureProfile ? (
                 <Image
-                  src={"https://scontent.fsgn1-1.fna.fbcdn.net/v/t39.30808-6/476450745_1016467233655474_8915782888244074_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEjQXSz-Gwwbb-Vjk3zSScRjhQORqcmw8iOFA5GpybDyPcPeWj11JpUVb5u66Rr4BE_WQMs5uImuONbWOJzsU_z&_nc_ohc=7nMfn4Hef7MQ7kNvgFavNzB&_nc_oc=Adh1BZYAthEzoRiTxyhvgTV1pXLzH5Rk-YRrUMxLmSQQ7Fpexz_4IJIda8QqlAegUZQ&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=A64KLm7H49k0mfTSVSTJeZO&oh=00_AYBXeMQPJ_3cgW6lvRNDR2i9lkivCx23ZYGgK4QTJoDmSg&oe=67C8B5B9"}
+                  src={"https://yt3.googleusercontent.com/VyVearlaIaJ9uD1ikXSores0pvd8UQUMM82sRPAe4M5NiwfQAoppC9Wn0-58oVFPqCbBGTiQ5A=s900-c-k-c0x00ffffff-no-rj"}
                   alt={currentUser.fullName || "User Profile"}
                   width={36}
                   height={36}
@@ -83,6 +84,12 @@ const Navbar = () => {
             <span className="mx-3 text-gray-800 dark:text-white font-semibold">
               {currentUser.fullName}
             </span>
+            
+            <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
+
+            {/* User Profile Dropdown */}
+            <ProfileDropdown user={currentUser} />
+
             <motion.button
               className="hidden rounded bg-blue-500 px-4 py-2 text-xs font-bold text-white hover:bg-blue-600 hover:scale-105 active:scale-95 transition-all md:block"
               onClick={() => setIsModalOpen(true)}

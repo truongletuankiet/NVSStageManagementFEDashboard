@@ -508,6 +508,44 @@ export const api = createApi({
       },
     }),
     
+    getUserById: build.query<User, string>({
+      queryFn: async (userId) => {
+        try {
+          console.log(`🔍 Fetching user with ID: ${userId} from API...`);
+    
+          // 🛑 Lấy token từ sessionStorage
+          const storedUser = sessionStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in sessionStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+    
+          // 🔥 Gửi request có kèm token
+          const response = await axios.get(`http://localhost:8080/api/v1/user/${userId}`, {
+            headers: { Authorization: `Bearer ${parsedUser.token}` },
+          });
+    
+          if (!response.data) {
+            console.error("❌ Failed to fetch user. Response:", response.data);
+            throw new Error("Failed to fetch user");
+          }
+    
+          const user: User = response.data;
+          console.log(`✅ Successfully fetched user: ${user.fullName}`);
+    
+          return { data: user };
+        } catch (error) {
+          console.error("❌ Error fetching user:", error);
+          return { error: error instanceof Error ? error.message : "Unknown error" };
+        }
+      },
+    }),
     
 
     getTeams: build.query<Team[], void>({
@@ -557,7 +595,7 @@ export const api = createApi({
           u.id.toLowerCase().includes(query.toLowerCase()),
         );
         const filteredProjects = mockProjects.filter((p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()),
+          p.title.toLowerCase().includes(query.toLowerCase()),
         );
         const filteredTasks = mockTasks.filter((t) =>
           t.title.toLowerCase().includes(query.toLowerCase()),
@@ -583,6 +621,7 @@ export const {
   useUpdateTaskStatusMutation,
   useSearchQuery,
   useGetUsersQuery,
+  useGetUserByIdQuery,
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,

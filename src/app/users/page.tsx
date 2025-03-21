@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useGetUsersQuery } from "@/state/api";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { CircularProgress } from "@mui/material";
 import {
   Card,
   CardContent,
@@ -54,6 +56,7 @@ const Users = () => {
   const { data: users, isLoading, isError } = useGetUsersQuery();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const router = useRouter();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: any) => {
     setAnchorEl(event.currentTarget);
@@ -65,7 +68,11 @@ const Users = () => {
     setSelectedUser(null);
   };
 
-  if (isLoading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Loading...</Box>;
+  if (isLoading) 
+    return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <CircularProgress />
+    </Box>;
+  
   if (isError || !users) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Error fetching users</Box>;
 
   const columns: GridColDef[] = [
@@ -76,7 +83,7 @@ const Users = () => {
       width: 250,
       headerAlign: "center",
       renderCell: (params) => (
-        <Stack direction="row" spacing={2} alignItems="center" width="100%">
+        <Stack direction="row" spacing={2} alignItems="center" width="100%" onClick={() => router.push(`/users/${params.row.id}`)}>
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Avatar
               alt={params.value}
@@ -108,6 +115,7 @@ const Users = () => {
           </Box>
         </Stack>
       ),
+      
     },
     
     {
