@@ -84,6 +84,7 @@ const Users = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <Stack direction="row" spacing={2} alignItems="center" width="100%" onClick={() => router.push(`/users/${params.row.id}`)}>
+          
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Avatar
               alt={params.value}

@@ -3,16 +3,15 @@ import { mockUsers as mockUsersArray } from "../../public/mockUsers";
 import axios from "axios";
 
 export interface Project {
-  projectID: string;   // ID của dự án (UUID)
-  title: string;       // Tên dự án
+  projectID: string; // ID của dự án (UUID)
+  title: string; // Tên dự án
   description?: string; // Mô tả dự án (có thể null)
-  content?: string;    // Nội dung chi tiết (có thể null)
-  startTime: string;   // Thời gian bắt đầu (ISO String)
-  endTime: string;     // Thời gian kết thúc (ISO String)
+  content?: string; // Nội dung chi tiết (có thể null)
+  startTime: string; // Thời gian bắt đầu (ISO String)
+  endTime: string; // Thời gian kết thúc (ISO String)
   department?: string; // Thông tin phòng ban (hiện tại API trả về "[]", có thể null)
-  createdBy: string;   // Người tạo dự án
+  createdBy: string; // Người tạo dự án
 }
-
 
 export enum Priority {
   Urgent = "Urgent",
@@ -52,7 +51,6 @@ export interface User {
     userID: string | null;
   }[];
 }
-
 
 export interface Attachment {
   id: number;
@@ -349,84 +347,98 @@ export const api = createApi({
     getAuthUser: build.query<User | null, void>({
       queryFn: async () => {
         try {
-          const storedUser = sessionStorage.getItem("user");
+          const storedUser = localStorage.getItem("user"); // 🔄 Lấy từ localStorage
           if (!storedUser) {
-            console.warn("⚠️ No user found in sessionStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { data: null };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { data: null };
           }
-    
+
           console.log("🔍 Fetching authenticated user info...");
-    
-          const response = await axios.get("http://localhost:8080/api/v1/user/my-info", {
-            headers: {
-              Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
+
+          const response = await axios.get(
+            "http://localhost:8080/api/v1/user/my-info",
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
+              },
             },
-          });
-    
+          );
+
           if (!response.data || response.data.code !== 1000) {
             throw new Error("❌ Failed to fetch authenticated user");
           }
-    
+
           const user: User = response.data.result;
-          console.log(`✅ Successfully fetched authenticated user: ${user.fullName}`);
-    
+          console.log(
+            `✅ Successfully fetched authenticated user: ${user.fullName}`,
+          );
+
           return { data: user };
         } catch (error) {
           console.error("❌ Error fetching authenticated user:", error);
-          return { error: error instanceof Error ? error.message : "Unknown error" };
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
         }
       },
     }),
-    
-    
+
     getProjects: build.query<Project[], void>({
       queryFn: async () => {
         try {
           console.log("🔍 Fetching all projects from API...");
-    
-          // 🛑 Lấy token từ sessionStorage
-          const storedUser = sessionStorage.getItem("user");
+
+          // 🛑 Lấy token từ localStorage
+          const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            console.warn("⚠️ No user found in sessionStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "User not authenticated" };
           }
-    
+
           // 🔥 Gửi request có kèm token
-          const response = await axios.get("http://localhost:8080/api/v1/project", {
-            headers: { Authorization: `Bearer ${parsedUser.token}` },
-          });
-    
+          const response = await axios.get(
+            "http://localhost:8080/api/v1/project",
+            {
+              headers: { Authorization: `Bearer ${parsedUser.token}` },
+            },
+          );
+
           if (!response.data) {
-            console.error("❌ Failed to fetch projects. Response:", response.data);
+            console.error(
+              "❌ Failed to fetch projects. Response:",
+              response.data,
+            );
             throw new Error("Failed to fetch projects");
           }
-    
+
           const projects: Project[] = response.data;
           if (!Array.isArray(projects)) {
             throw new Error("❌ Invalid project data format");
           }
-    
+
           console.log(`✅ Successfully fetched ${projects.length} projects`);
           return { data: projects };
         } catch (error) {
           console.error("❌ Error fetching projects:", error);
-          return { error: error instanceof Error ? error.message : "Unknown error" };
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
         }
       },
     }),
-    
+
     createProject: build.mutation<Project, Partial<Project>>({
       queryFn: async (project) => {
         const newProject = {
@@ -470,114 +482,128 @@ export const api = createApi({
       queryFn: async () => {
         try {
           console.log("🔍 Fetching all users from API...");
-    
-          // 🛑 Lấy token từ sessionStorage
-          const storedUser = sessionStorage.getItem("user");
+
+          const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            console.warn("⚠️ No user found in sessionStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "User not authenticated" };
           }
-    
-          // 🔥 Gửi request có kèm token
-          const response = await axios.get("http://localhost:8080/api/v1/user/get-all", {
-            headers: { Authorization: `Bearer ${parsedUser.token}` },
-          });
-    
+
+          const response = await axios.get(
+            "http://localhost:8080/api/v1/user/get-all",
+            {
+              headers: { Authorization: `Bearer ${parsedUser.token}` },
+            },
+          );
+
           if (!response.data || response.data.code !== 1000) {
             console.error("❌ Failed to fetch users. Response:", response.data);
             throw new Error("Failed to fetch users");
           }
-    
+
           const users: User[] = response.data.result;
           if (!Array.isArray(users)) {
             throw new Error("❌ Invalid user data format");
           }
-    
+
           console.log(`✅ Successfully fetched ${users.length} users`);
           return { data: users };
         } catch (error) {
           console.error("❌ Error fetching users:", error);
-          return { error: error instanceof Error ? error.message : "Unknown error" };
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
         }
       },
     }),
-    
+
     getUserById: build.query<User, string>({
       queryFn: async (userId) => {
         try {
           console.log(`🔍 Fetching user with ID: ${userId} from API...`);
-    
+
           // 🛑 Lấy token từ sessionStorage
-          const storedUser = sessionStorage.getItem("user");
+          const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            console.warn("⚠️ No user found in sessionStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "User not authenticated" };
           }
-    
+
           // 🔥 Gửi request có kèm token
-          const response = await axios.get(`http://localhost:8080/api/v1/user/${userId}`, {
-            headers: { Authorization: `Bearer ${parsedUser.token}` },
-          });
-    
+          const response = await axios.get(
+            `http://localhost:8080/api/v1/user/${userId}`,
+            {
+              headers: { Authorization: `Bearer ${parsedUser.token}` },
+            },
+          );
+
           if (!response.data) {
             console.error("❌ Failed to fetch user. Response:", response.data);
             throw new Error("Failed to fetch user");
           }
-    
-          const user: User = response.data;
-          console.log(`✅ Successfully fetched user: ${user.fullName}`);
-    
-          return { data: user };
+
+          // ✅ Kiểm tra nếu response đúng format
+          if (
+            !response.data?.result ||
+            typeof response.data.result !== "object"
+          ) {
+            throw new Error("Invalid user data");
+          }
+
+          return { data: response.data.result }; // 👈 Sửa lại đúng key chứa user
         } catch (error) {
           console.error("❌ Error fetching user:", error);
-          return { error: error instanceof Error ? error.message : "Unknown error" };
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
         }
       },
     }),
-    
 
     getTeams: build.query<Team[], void>({
       queryFn: async () => {
         try {
           console.log("🔍 Fetching all teams from API...");
-    
-          // 🛑 Lấy token từ sessionStorage
-          const storedUser = sessionStorage.getItem("user");
+
+          const storedUser = localStorage.getItem("user");
           if (!storedUser) {
-            console.warn("⚠️ No user found in sessionStorage.");
+            console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "User not authenticated" };
           }
-    
+
           // 🔥 Gửi request có kèm token
-          const response = await fetch("http://localhost:8080/api/v1/departments", {
-            headers: {
-              Authorization: `Bearer ${parsedUser.token}`,
-              "Content-Type": "application/json",
+          const response = await fetch(
+            "http://localhost:8080/api/v1/departments",
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
             },
-          });
-    
+          );
+
           if (!response.ok) {
             throw new Error("Failed to fetch teams");
           }
-    
+
           const data = await response.json();
           console.log(`✅ Successfully fetched ${data.length} teams`);
           return { data };
@@ -587,7 +613,6 @@ export const api = createApi({
         }
       },
     }),
-    
 
     search: build.query<SearchResults, string>({
       queryFn: async (query) => {

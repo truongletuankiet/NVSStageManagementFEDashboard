@@ -61,8 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const { token } = response.data.result; 
         const userData: User = { email, token };
 
-        // ✅ Lưu vào sessionStorage thay vì localStorage
-        sessionStorage.setItem("user", JSON.stringify(userData));
+        // ✅ Lưu vào **localStorage** thay vì sessionStorage
+        localStorage.setItem("user", JSON.stringify(userData));
+
         setUser(userData);
 
         // ✅ Cấu hình token cho axios
@@ -74,6 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setError("Đăng nhập thất bại. Kiểm tra lại thông tin!");
     }
 };
+
 
 
   const register = async (fullName: string, email: string, password: string, confirmPassword: string): Promise<void> => {
