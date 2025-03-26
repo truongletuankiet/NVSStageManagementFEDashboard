@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useGetUsersQuery } from "@/state/api";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
+import ModalNewUser from "./ModalNewUser";
 import {
   Card,
   CardContent,
@@ -20,7 +21,7 @@ import {
   Stack,
   Chip,
 } from "@mui/material";
-import { Edit, Delete, MoreVert } from "@mui/icons-material";
+import { Edit, Delete, MoreVert, PersonAdd } from "@mui/icons-material";
 import {
   DataGrid,
   GridColDef,
@@ -56,6 +57,7 @@ const Users = () => {
   const { data: users, isLoading, isError } = useGetUsersQuery();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [openNewUserModal, setOpenNewUserModal] = useState(false);
   const router = useRouter();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: any) => {
@@ -68,11 +70,11 @@ const Users = () => {
     setSelectedUser(null);
   };
 
-  if (isLoading) 
+  if (isLoading)
     return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
       <CircularProgress />
     </Box>;
-  
+
   if (isError || !users) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Error fetching users</Box>;
 
   const columns: GridColDef[] = [
@@ -84,7 +86,7 @@ const Users = () => {
       headerAlign: "center",
       renderCell: (params) => (
         <Stack direction="row" spacing={2} alignItems="center" width="100%" onClick={() => router.push(`/users/${params.row.id}`)}>
-          
+
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Avatar
               alt={params.value}
@@ -116,9 +118,9 @@ const Users = () => {
           </Box>
         </Stack>
       ),
-      
+
     },
-    
+
     {
       field: "department",
       headerName: "Department",
@@ -157,8 +159,8 @@ const Users = () => {
         );
       },
     },
-    
-    
+
+
     {
       field: "actions",
       headerName: "ACTIONS",
@@ -178,7 +180,20 @@ const Users = () => {
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
-      <Header name="Users" />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Header name="Users" />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<PersonAdd />}
+          onClick={() => setOpenNewUserModal(true)}
+          sx={{ minWidth: 160, whiteSpace: "nowrap" }} // Đảm bảo đủ rộng và không xuống dòng
+        >
+          New User
+        </Button>
+      </Box>
+
+
       <DataGrid
         rows={users}
         columns={columns}
@@ -218,6 +233,7 @@ const Users = () => {
           <Typography color="error">Delete</Typography>
         </MenuItem>
       </Menu>
+      <ModalNewUser open={openNewUserModal} onClose={() => setOpenNewUserModal(false)} />
     </div>
   );
 };

@@ -26,10 +26,10 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
     });
 
     await createProject({
-      name: projectName,
+      title: projectName,
       description,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+      startTime: formattedStartDate,
+      endTime: formattedEndDate,
     });
   };
 
