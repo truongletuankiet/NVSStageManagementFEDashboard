@@ -108,7 +108,7 @@ const PersonalPage = () => {
           </ListItem>
           <ListItem>
             <ListItemIcon><CalendarToday /></ListItemIcon>
-            {/* <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth)} /> */}
+            <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth)} />
           </ListItem>
           <ListItem>
             <ListItemIcon><Email /></ListItemIcon>
@@ -120,7 +120,7 @@ const PersonalPage = () => {
           </ListItem>
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
-            {/* <ListItemText primary="Role ID" secondary={user.roleID || "N/A"} /> */}
+            <ListItemText primary="Role ID" secondary={user.role?.roleName || "Chưa có Role"} />
           </ListItem>
           <ListItem>
             <ListItemIcon><History /></ListItemIcon>

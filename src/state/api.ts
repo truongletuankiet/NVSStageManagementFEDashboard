@@ -635,6 +635,49 @@ export const api = createApi({
         };
       },
     }),
+
+    createUserByAdmin: build.mutation<{ success: boolean }, { name: string; email: string; role: string }>({
+      queryFn: async (userData) => {
+        try {
+          console.log("🚀 Creating user by admin:", userData);
+
+          // 🛑 Lấy token từ sessionStorage
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+
+          // 🔥 Gửi request có kèm token
+          const response = await axios.post(
+            "http://localhost:8080/api/v1/user",
+            userData,
+            {
+              headers: { Authorization: `Bearer ${parsedUser.token}` },
+            }
+          );
+
+          if (!response.data) {
+            console.error("❌ Failed to create user. Response:", response.data);
+            throw new Error("Failed to create user");
+          }
+
+          return { data: { success: true } };
+        } catch (error) {
+          console.error("❌ Error creating user:", error);
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
+      },
+    }),
+
   }),
 });
 
@@ -650,4 +693,5 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
+  useCreateUserByAdminMutation
 } = api;
