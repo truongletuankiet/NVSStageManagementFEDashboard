@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useEffect } from "react";
-import { useGetUserByIdQuery } from "@/state/api";
+import { useGetUserByIdQuery, useGetProjectsByUserQuery } from "@/state/api";
 import {
   Card,
   Typography,
@@ -15,9 +15,11 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
+  Grid,
 } from "@mui/material";
 import { Work, History, Email, Business, CalendarToday, VerifiedUser } from "@mui/icons-material";
 import Header from "@/components/Header";
+import ProjectCard from "@/components/ProjectCard"; // Import ProjectCard
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -35,19 +37,20 @@ const getStatusColor = (status: string) => {
 const formatDate = (dateString?: string) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleDateString("vi-VN"); // Định dạng ngày theo tiếng Việt (dd/mm/yyyy)
+  return date.toLocaleDateString("vi-VN");
 };
 
 const formatDateTime = (dateString?: string) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleString("vi-VN"); // Định dạng ngày giờ theo tiếng Việt
+  return date.toLocaleString("vi-VN");
 };
 
 const PersonalPage = () => {
   const params = useParams();
   const id = params?.id as string;
   const { data: user, isLoading, isError } = useGetUserByIdQuery(id);
+  const { data: projects, isLoading: isLoadingProjects } = useGetProjectsByUserQuery(id);
   const router = useRouter();
 
   useEffect(() => {
@@ -128,6 +131,30 @@ const PersonalPage = () => {
           </ListItem>
         </List>
       </Card>
+
+      {/* Danh sách Project */}
+      <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Projects Managed by {user.fullName}
+        </Typography>
+        {isLoadingProjects ? (
+          <Box display="flex" justifyContent="center" alignItems="center" py={2}>
+            <CircularProgress />
+          </Box>
+        ) : projects && projects.length > 0 ? (
+          <Grid container spacing={2}>
+            {projects.map((project) => (
+              <Grid item xs={12} sm={6} key={project.id}>
+                <ProjectCard project={project} />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography variant="body1" color="textSecondary">
+            No projects found.
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };

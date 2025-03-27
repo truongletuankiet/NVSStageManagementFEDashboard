@@ -439,6 +439,55 @@ export const api = createApi({
       },
     }),
 
+    getProjectsByUser: build.query<Project[], string>({
+      queryFn: async (userId) => {
+        try {
+          console.log(`🔍 Fetching projects for user: ${userId}`);
+    
+          // 🛑 Lấy token từ localStorage
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+    
+          // 🔥 Gửi request có kèm token
+          const response = await axios.get(
+            `http://localhost:8080/api/v1/project/userId?userId=${userId}`,
+            {
+              headers: { Authorization: `Bearer ${parsedUser.token}` },
+            }
+          );
+    
+          if (!response.data) {
+            console.error("❌ Failed to fetch projects for user:", response.data);
+            throw new Error("Failed to fetch projects");
+          }
+    
+          const projects: Project[] = response.data;
+          if (!Array.isArray(projects)) {
+            throw new Error("❌ Invalid project data format");
+          }
+    
+          console.log(`✅ Successfully fetched ${projects.length} projects for user ${userId}`);
+          return { data: projects };
+        } catch (error) {
+          console.error("❌ Error fetching projects for user:", error);
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
+      },
+    }),
+    
+    
+
     createProject: build.mutation<Project, Partial<Project>>({
       queryFn: async (project) => {
         const newProject = {
@@ -679,6 +728,9 @@ export const api = createApi({
     }),
 
   }),
+
+
+  
 });
 
 export const {
@@ -693,5 +745,6 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
-  useCreateUserByAdminMutation
+  useCreateUserByAdminMutation,
+  useGetProjectsByUserQuery
 } = api;
