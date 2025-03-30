@@ -219,7 +219,12 @@ const Users = () => {
         }}
       />
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={() => alert(`Editing ${selectedUser?.fullName}`)}>
+        <MenuItem onClick={() => {
+          if (selectedUser?.id) {
+            router.push(`/users/${selectedUser.id}?edit=true`);
+          }
+          handleMenuClose();
+        }}>
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useGetUserByIdQuery, useGetProjectsByUserQuery } from "@/state/api";
 import {
   Card,
@@ -16,10 +16,12 @@ import {
   ListItemText,
   ListItemIcon,
   Grid,
+  TextField,
+  Button,
 } from "@mui/material";
 import { Work, History, Email, Business, CalendarToday, VerifiedUser } from "@mui/icons-material";
 import Header from "@/components/Header";
-import ProjectCard from "@/components/ProjectCard"; // Import ProjectCard
+import ProjectCard from "@/components/ProjectCard";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -48,22 +50,36 @@ const formatDateTime = (dateString?: string) => {
 
 const PersonalPage = () => {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
+  const isEditing = searchParams.get("edit") === "true";
   const { data: user, isLoading, isError } = useGetUserByIdQuery(id);
   const { data: projects, isLoading: isLoadingProjects } = useGetProjectsByUserQuery(id);
   const router = useRouter();
+  const [editedUser, setEditedUser] = useState({ fullName: "", email: "", dayOfBirth: "", department: "", role: "" });
 
   useEffect(() => {
     if (!id) {
       router.push("/users");
       return;
     }
-
     if (isError) {
       alert("Error fetching user data. Redirecting to user list...");
       router.push("/users");
     }
   }, [id, isError, router]);
+
+  useEffect(() => {
+    if (user) {
+      setEditedUser({
+        fullName: user.fullName,
+        email: user.email,
+        dayOfBirth: user.dayOfBirth,
+        department: user.department?.name || "",
+        role: user.role?.roleName || "",
+      });
+    }
+  }, [user]);
 
   if (isLoading)
     return (
@@ -84,56 +100,69 @@ const PersonalPage = () => {
 
   const { bg, text } = getStatusColor(user.status);
 
+  const handleSave = () => {
+    console.log("Saving...", editedUser);
+    // TODO: Call API to update user details
+  };
+
   return (
     <Box className="container h-full w-full bg-gray-100 p-8">
       <Header name={`User: ${user.fullName}`} />
       <Card sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
         <Box display="flex" alignItems="center" gap={2}>
-          <Avatar 
-            src={user.pictureProfile || "/default-avatar.png"} 
-            alt={user.fullName} 
-            sx={{ width: 80, height: 80 }} 
-          />
+          <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 80, height: 80 }} />
           <Box>
-            <Typography variant="h5" fontWeight="bold">{user.fullName}</Typography>
+            {isEditing ? (
+              <TextField label="Full Name" variant="outlined" fullWidth value={editedUser.fullName} onChange={(e) => setEditedUser({ ...editedUser, fullName: e.target.value })} />
+            ) : (
+              <Typography variant="h5" fontWeight="bold">{user.fullName}</Typography>
+            )}
             <Typography variant="body1" color="textSecondary">{user.email}</Typography>
-            <Chip
-              label={user.status}
-              sx={{ backgroundColor: bg, color: text, fontWeight: "bold" }}
-            />
+            <Chip label={user.status} sx={{ backgroundColor: bg, color: text, fontWeight: "bold" }} />
           </Box>
         </Box>
         <Divider sx={{ my: 2 }} />
         <List>
           <ListItem>
             <ListItemIcon><Business /></ListItemIcon>
-            <ListItemText primary="Department" secondary={user.department?.name || "N/A"} />
+            {isEditing ? (
+              <TextField label="Department" fullWidth value={editedUser.department} onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })} />
+            ) : (
+              <ListItemText primary="Department" secondary={user.department?.name || "N/A"} />
+            )}
           </ListItem>
           <ListItem>
             <ListItemIcon><CalendarToday /></ListItemIcon>
-            <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth)} />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon><Email /></ListItemIcon>
-            <ListItemText primary="Email" secondary={user.email} />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon><VerifiedUser /></ListItemIcon>
-            <ListItemText primary="User ID" secondary={user.id} />
+            {isEditing ? (
+              <TextField type="date" fullWidth value={editedUser.dayOfBirth} onChange={(e) => setEditedUser({ ...editedUser, dayOfBirth: e.target.value })} />
+            ) : (
+              <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth)} />
+            )}
           </ListItem>
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
-            <ListItemText primary="Role ID" secondary={user.role?.roleName || "Chưa có Role"} />
+            {isEditing ? (
+              <TextField label="Role" fullWidth value={editedUser.role} onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })} />
+            ) : (
+              <ListItemText primary="Role" secondary={user.role?.roleName || "Chưa có Role"} />
+            )}
           </ListItem>
+
           <ListItem>
             <ListItemIcon><History /></ListItemIcon>
             <ListItemText primary="Account Created" secondary={formatDateTime(user.createDate)} />
           </ListItem>
+
         </List>
+        {isEditing && (
+          <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2 }}>
+            Save
+          </Button>
+        )}
       </Card>
 
-      {/* Danh sách Project */}
-      <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
+        {/* Danh sách Project */}
+        <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
           Projects Managed by {user.fullName}
         </Typography>
