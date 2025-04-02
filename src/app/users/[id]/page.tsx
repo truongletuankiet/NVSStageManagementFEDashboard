@@ -2,7 +2,7 @@
 
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useGetUserByIdQuery, useGetProjectsByUserQuery } from "@/state/api";
+import { useGetUserByIdQuery, useGetProjectsByUserQuery, useGetRolesQuery, useGetTeamsQuery } from "@/state/api";
 import {
   Card,
   Typography,
@@ -18,6 +18,8 @@ import {
   Grid,
   TextField,
   Button,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { Work, History, Email, Business, CalendarToday, VerifiedUser } from "@mui/icons-material";
 import Header from "@/components/Header";
@@ -55,6 +57,8 @@ const PersonalPage = () => {
   const isEditing = searchParams.get("edit") === "true";
   const { data: user, isLoading, isError } = useGetUserByIdQuery(id);
   const { data: projects, isLoading: isLoadingProjects } = useGetProjectsByUserQuery(id);
+  const { data: roles } = useGetRolesQuery();
+  const { data: departments } = useGetTeamsQuery();
   const router = useRouter();
   const [editedUser, setEditedUser] = useState({ fullName: "", email: "", dayOfBirth: "", department: "", role: "" });
 
@@ -75,8 +79,8 @@ const PersonalPage = () => {
         fullName: user.fullName,
         email: user.email,
         dayOfBirth: user.dayOfBirth,
-        department: user.department?.name || "",
-        role: user.role?.roleName || "",
+        department: user.department?.id || "",
+        role: user.role?.id || "",
       });
     }
   }, [user]);
@@ -113,11 +117,10 @@ const PersonalPage = () => {
           <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 80, height: 80 }} />
           <Box>
             {isEditing ? (
-              <TextField label="Full Name" variant="outlined" fullWidth value={editedUser.fullName} onChange={(e) => setEditedUser({ ...editedUser, fullName: e.target.value })} />
+              <TextField label="Full Name" fullWidth value={editedUser.fullName} onChange={(e) => setEditedUser({ ...editedUser, fullName: e.target.value })} />
             ) : (
               <Typography variant="h5" fontWeight="bold">{user.fullName}</Typography>
             )}
-            <Typography variant="body1" color="textSecondary">{user.email}</Typography>
             <Chip label={user.status} sx={{ backgroundColor: bg, color: text, fontWeight: "bold" }} />
           </Box>
         </Box>
@@ -126,7 +129,11 @@ const PersonalPage = () => {
           <ListItem>
             <ListItemIcon><Business /></ListItemIcon>
             {isEditing ? (
-              <TextField label="Department" fullWidth value={editedUser.department} onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })} />
+              <Select fullWidth value={editedUser.department} onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })}>
+                {departments?.map((dept) => (
+                  <MenuItem key={dept.id} value={dept.id}>{dept.name}</MenuItem>
+                ))}
+              </Select>
             ) : (
               <ListItemText primary="Department" secondary={user.department?.name || "N/A"} />
             )}
@@ -142,7 +149,11 @@ const PersonalPage = () => {
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
             {isEditing ? (
-              <TextField label="Role" fullWidth value={editedUser.role} onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })} />
+              <Select fullWidth value={editedUser.role} onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}>
+                {roles?.map((role) => (
+                  <MenuItem key={role.id} value={role.id}>{role.roleName}</MenuItem>
+                ))}
+              </Select>
             ) : (
               <ListItemText primary="Role" secondary={user.role?.roleName || "Chưa có Role"} />
             )}
@@ -160,7 +171,7 @@ const PersonalPage = () => {
           </Button>
         )}
       </Card>
-
+      
         {/* Danh sách Project */}
         <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
