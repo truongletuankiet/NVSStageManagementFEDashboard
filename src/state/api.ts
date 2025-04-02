@@ -13,6 +13,11 @@ export interface Project {
   createdBy: string; // Người tạo dự án
 }
 
+export interface Role {
+  id: number;
+  roleName: string;
+}
+
 export enum Priority {
   Urgent = "Urgent",
   High = "High",
@@ -727,6 +732,23 @@ export const api = createApi({
       },
     }),
 
+    getRoles: build.query<Role[], void>({
+      queryFn: async () => {
+        console.log("🔍 Returning fixed roles...");
+
+        // Danh sách vai trò cố định
+        const fixedRoles: Role[] = [
+          { id: 1, roleName: "Admin" },
+          { id: 2, roleName: "Concert Master" },
+          { id: 3, roleName: "Staff" },
+          { id: 4, roleName: "Leader" },
+        ];
+
+        console.log(`✅ Successfully returned ${fixedRoles.length} fixed roles`);
+        return { data: fixedRoles };
+      },
+    }),
+
   }),
 
 
@@ -746,5 +768,6 @@ export const {
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
   useCreateUserByAdminMutation,
-  useGetProjectsByUserQuery
+  useGetProjectsByUserQuery,
+  useGetRolesQuery
 } = api;

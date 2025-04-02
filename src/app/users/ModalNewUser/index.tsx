@@ -12,10 +12,10 @@ import {
 import { useGetTeamsQuery, useCreateUserByAdminMutation } from "@/state/api";
 
 const roles = [
-  { id: 1, name: "Admin" },
-  { id: 2, name: "Concert Master" },
-  { id: 3, name: "Staff" },
-  { id: 4, name: "Leader" },
+  { id: 1, roleName: "Admin" },
+  { id: 2, roleName: "Concert Master" },
+  { id: 3, roleName: "Staff" },
+  { id: 4, roleName: "Leader" },
 ];
 
 const ModalNewUser = ({ open, onClose }) => {
@@ -153,7 +153,7 @@ const ModalNewUser = ({ open, onClose }) => {
         >
           {roles.map((role) => (
             <MenuItem key={role.id} value={role.id}>
-              {role.name}
+              {role.roleName}
             </MenuItem>
           ))}
         </TextField>
