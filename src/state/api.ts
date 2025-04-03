@@ -616,6 +616,7 @@ export const api = createApi({
             throw new Error("Invalid user data");
           }
 
+          console.log(response.data.result);
           return { data: response.data.result }; // 👈 Sửa lại đúng key chứa user
         } catch (error) {
           console.error("❌ Error fetching user:", error);
@@ -748,8 +749,53 @@ export const api = createApi({
         return { data: fixedRoles };
       },
     }),
+    updateUser: build.mutation<User, { userId: string; data: Partial<User> }>({
+      queryFn: async ({ userId, data }) => {
+        try {
+          console.log(`🔄 Updating user with ID: ${userId}`);
+    
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+    
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "Invalid authentication token" };
+          }
+    
+          const response = await axios.put(
+            `http://localhost:8080/api/v1/user/${userId}`,
+            data,
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+    
+          if (!response.data || response.data.code !== 1000) {
+            throw new Error("❌ Failed to update user");
+          }
+    
+          console.log("✅ User updated successfully:", response.data.result);
+          return { data: response.data.result };
+        } catch (error) {
+          console.error("❌ Error updating user:", error);
+          return {
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
+      },
+    }),
+    
 
   }),
+
+  
 
 
   
@@ -769,5 +815,6 @@ export const {
   useGetAuthUserQuery,
   useCreateUserByAdminMutation,
   useGetProjectsByUserQuery,
-  useGetRolesQuery
+  useGetRolesQuery,
+  useUpdateUserMutation
 } = api;

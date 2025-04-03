@@ -78,9 +78,9 @@ const PersonalPage = () => {
       setEditedUser({
         fullName: user.fullName,
         email: user.email,
-        dayOfBirth: user.dayOfBirth,
-        department: user.department?.id || "",
-        role: user.role?.id || "",
+        dayOfBirth: user.dayOfBirth?.toString() || formatDate(user.dayOfBirth?.toString()),
+        department: user.department?.name,
+        role: user.role?.roleName,
       });
     }
   }, [user]);
@@ -110,24 +110,24 @@ const PersonalPage = () => {
   };
 
   return (
-    <Box className="container h-full w-full bg-gray-100 p-8">
+    <Box className="container h-full w-full bg-gradient-to-b from-blue-100 to-white p-8">
       <Header name={`User: ${user.fullName}`} />
-      <Card sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
-        <Box display="flex" alignItems="center" gap={2}>
-          <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 80, height: 80 }} />
+      <Card sx={{ maxWidth: 900, mx: "auto", p: 4, borderRadius: 3, boxShadow: 5 }}>
+        <Box display="flex" alignItems="center" gap={3}>
+          <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 100, height: 100, border: "3px solid #3b82f6" }} />
           <Box>
             {isEditing ? (
               <TextField label="Full Name" fullWidth value={editedUser.fullName} onChange={(e) => setEditedUser({ ...editedUser, fullName: e.target.value })} />
             ) : (
-              <Typography variant="h5" fontWeight="bold">{user.fullName}</Typography>
+              <Typography variant="h4" fontWeight="bold" color="primary">{user.fullName}</Typography>
             )}
             <Chip label={user.status} sx={{ backgroundColor: bg, color: text, fontWeight: "bold" }} />
           </Box>
         </Box>
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 3 }} />
         <List>
           <ListItem>
-            <ListItemIcon><Business /></ListItemIcon>
+            <ListItemIcon><Business color="primary" /></ListItemIcon>
             {isEditing ? (
               <Select fullWidth value={editedUser.department} onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })}>
                 {departments?.map((dept) => (
@@ -139,13 +139,13 @@ const PersonalPage = () => {
             )}
           </ListItem>
           <ListItem>
-            <ListItemIcon><CalendarToday /></ListItemIcon>
+            <ListItemIcon><CalendarToday color="primary" /></ListItemIcon>
             {isEditing ? (
               <TextField type="date" fullWidth value={editedUser.dayOfBirth} onChange={(e) => setEditedUser({ ...editedUser, dayOfBirth: e.target.value })} />
             ) : (
-              <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth)} />
+              <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth?.toString())} />
             )}
-          </ListItem>
+            </ListItem>
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
             {isEditing ? (
@@ -155,7 +155,7 @@ const PersonalPage = () => {
                 ))}
               </Select>
             ) : (
-              <ListItemText primary="Role" secondary={user.role?.roleName || "Chưa có Role"} />
+              <ListItemText primary="Role" secondary={user.role?.name || "Chưa có Role"} />
             )}
           </ListItem>
 
@@ -166,8 +166,8 @@ const PersonalPage = () => {
 
         </List>
         {isEditing && (
-          <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2 }}>
-            Save
+          <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2, borderRadius: "20px" }}>
+            Save Changes
           </Button>
         )}
       </Card>
