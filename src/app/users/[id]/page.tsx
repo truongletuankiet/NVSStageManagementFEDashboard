@@ -2,7 +2,13 @@
 
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useGetUserByIdQuery, useGetProjectsByUserQuery, useGetRolesQuery, useGetTeamsQuery } from "@/state/api";
+import {
+  useGetUserByIdQuery,
+  useGetProjectsByUserQuery,
+  useGetRolesQuery,
+  useGetTeamsQuery,
+  useUpdateUserMutation,
+} from "@/state/api";
 import {
   Card,
   Typography,
@@ -59,8 +65,9 @@ const PersonalPage = () => {
   const { data: projects, isLoading: isLoadingProjects } = useGetProjectsByUserQuery(id);
   const { data: roles } = useGetRolesQuery();
   const { data: departments } = useGetTeamsQuery();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const router = useRouter();
-  const [editedUser, setEditedUser] = useState({ fullName: "", email: "", dayOfBirth: "", department: "", role: "" });
+  const [editedUser, setEditedUser] = useState({ fullName: "", email: "", dayOfBirth: "", departmentId: "", roleId: "" });
 
   useEffect(() => {
     if (!id) {
@@ -79,8 +86,8 @@ const PersonalPage = () => {
         fullName: user.fullName,
         email: user.email,
         dayOfBirth: user.dayOfBirth?.toString() || formatDate(user.dayOfBirth?.toString()),
-        department: user.department?.name,
-        role: user.role?.roleName,
+        departmentId: user.department?.id,
+        roleId: user.role?.roleName,
       });
     }
   }, [user]);
@@ -104,14 +111,39 @@ const PersonalPage = () => {
 
   const { bg, text } = getStatusColor(user.status);
 
-  const handleSave = () => {
-    console.log("Saving...", editedUser);
-    // TODO: Call API to update user details
+  // const handleSave = async () => {
+  //   try {
+  //     await updateUser({ id, ...editedUser }).unwrap();
+  //     alert("User updated successfully!");
+  //     router.push(`/users/${id}`);
+  //   } catch (error) {
+  //     console.error("Error updating user:", error);
+  //     alert("Failed to update user!");
+  //   }
+  // };
+
+  const handleSave = async () => {
+    if (!id) {
+      alert("User ID is missing.");
+      return;
+    }
+  
+    try {
+      // Gọi hook useUpdateUserMutation và truyền đúng tham số
+      const result = await updateUser({ userId: id, data: editedUser }).unwrap(); // unwrapped để lấy kết quả hoặc lỗi từ API call
+      alert("User updated successfully!");
+      router.push(`/users/${id}`);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Failed to update user!");
+    }
   };
+  
+  
 
   return (
     <Box className="container h-full w-full bg-gradient-to-b from-blue-100 to-white p-8">
-      <Header name={`User: ${user.fullName}`} />
+      <Header name={`User: ${user.id}`} />
       <Card sx={{ maxWidth: 900, mx: "auto", p: 4, borderRadius: 3, boxShadow: 5 }}>
         <Box display="flex" alignItems="center" gap={3}>
           <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 100, height: 100, border: "3px solid #3b82f6" }} />
@@ -127,9 +159,13 @@ const PersonalPage = () => {
         <Divider sx={{ my: 3 }} />
         <List>
           <ListItem>
+            <ListItemIcon><Email color="primary" /></ListItemIcon>
+            <ListItemText primary="Email" secondary={user.email} />
+          </ListItem>
+          <ListItem>
             <ListItemIcon><Business color="primary" /></ListItemIcon>
             {isEditing ? (
-              <Select fullWidth value={editedUser.department} onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })}>
+              <Select fullWidth value={editedUser.departmentId} onChange={(e) => setEditedUser({ ...editedUser, departmentId: e.target.value })}>
                 {departments?.map((dept) => (
                   <MenuItem key={dept.id} value={dept.id}>{dept.name}</MenuItem>
                 ))}
@@ -145,11 +181,11 @@ const PersonalPage = () => {
             ) : (
               <ListItemText primary="Date of Birth" secondary={formatDate(user.dayOfBirth?.toString())} />
             )}
-            </ListItem>
+          </ListItem>
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
             {isEditing ? (
-              <Select fullWidth value={editedUser.role} onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}>
+              <Select fullWidth value={editedUser.roleId} onChange={(e) => setEditedUser({ ...editedUser, roleId: e.target.value })}>
                 {roles?.map((role) => (
                   <MenuItem key={role.id} value={role.id}>{role.roleName}</MenuItem>
                 ))}
@@ -166,14 +202,14 @@ const PersonalPage = () => {
 
         </List>
         {isEditing && (
-          <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2, borderRadius: "20px" }}>
-            Save Changes
+          <Button variant="contained" color="primary" onClick={handleSave} disabled={isUpdating} sx={{ mt: 2, borderRadius: "20px" }}>
+            {isUpdating ? "Saving..." : "Save Changes"}
           </Button>
         )}
       </Card>
-      
-        {/* Danh sách Project */}
-        <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
+
+       {/* Danh sách Project */}
+      <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
           Projects Managed by {user.fullName}
         </Typography>

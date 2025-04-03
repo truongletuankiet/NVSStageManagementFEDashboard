@@ -749,26 +749,30 @@ export const api = createApi({
         return { data: fixedRoles };
       },
     }),
+    
     updateUser: build.mutation<User, { userId: string; data: Partial<User> }>({
       queryFn: async ({ userId, data }) => {
         try {
           console.log(`🔄 Updating user with ID: ${userId}`);
-    
+        
+          // Thêm thuộc tính password vào data
+          const updatedData = { ...data, password: "abc123", pictureProfile: "string",}; // Thêm password vào data
+        
           const storedUser = localStorage.getItem("user");
           if (!storedUser) {
             console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+        
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "Invalid authentication token" };
           }
-    
+        
           const response = await axios.put(
             `http://localhost:8080/api/v1/user/${userId}`,
-            data,
+            updatedData, // Sử dụng updatedData thay vì data gốc
             {
               headers: {
                 Authorization: `Bearer ${parsedUser.token}`,
@@ -776,11 +780,11 @@ export const api = createApi({
               },
             }
           );
-    
+        
           if (!response.data || response.data.code !== 1000) {
             throw new Error("❌ Failed to update user");
           }
-    
+        
           console.log("✅ User updated successfully:", response.data.result);
           return { data: response.data.result };
         } catch (error) {
@@ -790,7 +794,8 @@ export const api = createApi({
           };
         }
       },
-    }),
+    })
+    
     
 
   }),
