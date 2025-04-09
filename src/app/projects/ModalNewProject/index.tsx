@@ -12,8 +12,12 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [createProject, { isLoading }] = useCreateProjectMutation();
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [projectTypeID, setProjectTypeID] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [createdBy, setCreatedBy] = useState("");
+
 
   const handleSubmit = async () => {
     if (!projectName || !startDate || !endDate) return;
@@ -28,14 +32,20 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
     await createProject({
       title: projectName,
       description,
+      content,
       startTime: formattedStartDate,
       endTime: formattedEndDate,
-    });
+      projectTypeID,
+      createdBy,
+    }).unwrap();
+
+
   };
 
   const isFormValid = () => {
-    return projectName && description && startDate && endDate;
+    return projectName && description && startDate && endDate && projectTypeID && createdBy;
   };
+
 
   const inputStyles =
     "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
@@ -62,6 +72,12 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <textarea
+          className={inputStyles}
+          placeholder="Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
           <input
             type="date"
@@ -76,11 +92,29 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
+        <select
+          className={inputStyles}
+          value={projectTypeID}
+          onChange={(e) => setProjectTypeID(e.target.value)}
+        >
+          <option value="">Select Project Type</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <input
+          type="text"
+          className={inputStyles}
+          placeholder="Created By"
+          value={createdBy}
+          onChange={(e) => setCreatedBy(e.target.value)}
+        />
+
         <button
           type="submit"
-          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-            !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
-          }`}
+          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+            }`}
           disabled={!isFormValid() || isLoading}
         >
           {isLoading ? "Creating..." : "Create Project"}

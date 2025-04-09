@@ -4,6 +4,10 @@ import { useGetUsersQuery } from "@/state/api";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { CircularProgress, Button } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Snackbar } from "@mui/material";
+
+
 import ModalNewUser from "./ModalNewUser";
 import {
   Card,
@@ -59,6 +63,8 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [openNewUserModal, setOpenNewUserModal] = useState(false);
   const router = useRouter();
+  const [copyMessageOpen, setCopyMessageOpen] = useState(false);
+
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: any) => {
     setAnchorEl(event.currentTarget);
@@ -78,7 +84,34 @@ const Users = () => {
   if (isError || !users) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh">Error fetching users</Box>;
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 100, headerAlign: "center", align: "center" },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 100,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      renderCell: (params) => (
+        <Tooltip title="Copy ID">
+          <IconButton
+            size="small"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(params.value);
+                setCopyMessageOpen(true); // Mở Snackbar báo thành công
+              } catch (err) {
+                console.error("Failed to copy: ", err);
+                alert("Copy failed. Your browser may not support it.");
+              }
+            }}
+          >
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )
+
+    },
+
     {
       field: "fullName",
       headerName: "FULL NAME",
@@ -201,6 +234,7 @@ const Users = () => {
         pagination
         slots={{ toolbar: CustomToolbar }}
         sx={{
+          mx: "auto", // 👈 căn giữa theo chiều ngang
           "& .MuiDataGrid-row:nth-of-type(odd)": { backgroundColor: "#FFFFFF" },
           "& .MuiDataGrid-row:hover": { backgroundColor: "#e3f2fd" },
           "& .MuiDataGrid-columnHeaders": {
@@ -215,9 +249,12 @@ const Users = () => {
           },
 
           "& .MuiDataGrid-cell": { display: "flex", justifyContent: "center", alignItems: "center" },
-          width: "100%", maxWidth: 1200, p: 0, boxShadow: 4, borderRadius: 2, bgcolor: "#fafafa"
+          width: "100%", maxWidth: 800, p: 0, boxShadow: 4, borderRadius: 2, bgcolor: "#fafafa"
         }}
       />
+
+
+
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => {
           if (selectedUser?.id) {
@@ -239,6 +276,13 @@ const Users = () => {
         </MenuItem>
       </Menu>
       <ModalNewUser open={openNewUserModal} onClose={() => setOpenNewUserModal(false)} />
+      <Snackbar
+        open={copyMessageOpen}
+        autoHideDuration={2000}
+        onClose={() => setCopyMessageOpen(false)}
+        message="ID copied to clipboard!"
+      />
+
     </div>
   );
 };

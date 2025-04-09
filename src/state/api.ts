@@ -11,6 +11,8 @@ export interface Project {
   endTime: string; // Thời gian kết thúc (ISO String)
   department?: string; // Thông tin phòng ban (hiện tại API trả về "[]", có thể null)
   createdBy: string; // Người tạo dự án
+  projectTypeID: string;
+  projectTypeName: string;
 }
 
 export interface Role {
@@ -96,6 +98,16 @@ export interface Team {
   name: string;
   description?: string;
   users: User[];
+}
+
+// types.ts hoặc ngay trong file api nếu chưa tách
+export interface Milestone {
+  title: string;
+  description: string;
+  startDate: string; // ISO format: "2025-04-09"
+  endDate: string; // ISO format
+  projectID: string;
+  events: any[]; // có thể khai báo cụ thể hơn nếu biết rõ
 }
 
 // === MOCK DATA ===
@@ -448,39 +460,44 @@ export const api = createApi({
       queryFn: async (userId) => {
         try {
           console.log(`🔍 Fetching projects for user: ${userId}`);
-    
+
           // 🛑 Lấy token từ localStorage
           const storedUser = localStorage.getItem("user");
           if (!storedUser) {
             console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-    
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "User not authenticated" };
           }
-    
+
           // 🔥 Gửi request có kèm token
           const response = await axios.get(
             `http://localhost:8080/api/v1/project/userId?userId=${userId}`,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
-            }
+            },
           );
-    
+
           if (!response.data) {
-            console.error("❌ Failed to fetch projects for user:", response.data);
+            console.error(
+              "❌ Failed to fetch projects for user:",
+              response.data,
+            );
             throw new Error("Failed to fetch projects");
           }
-    
+
           const projects: Project[] = response.data;
           if (!Array.isArray(projects)) {
             throw new Error("❌ Invalid project data format");
           }
-    
-          console.log(`✅ Successfully fetched ${projects.length} projects for user ${userId}`);
+
+          console.log(
+            `✅ Successfully fetched ${projects.length} projects for user ${userId}`,
+          );
           return { data: projects };
         } catch (error) {
           console.error("❌ Error fetching projects for user:", error);
@@ -490,19 +507,54 @@ export const api = createApi({
         }
       },
     }),
-    
-    
 
     createProject: build.mutation<Project, Partial<Project>>({
       queryFn: async (project) => {
-        const newProject = {
-          ...project,
-          id: mockProjects.length + 1,
-        } as Project;
-        mockProjects.push(newProject);
-        return { data: newProject };
+        try {
+          console.log("🚀 Creating new project...");
+
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          const token = parsedUser?.token;
+
+          if (!token) {
+            console.warn("⚠️ Invalid or missing authentication token.");
+            return { error: "Invalid authentication token" };
+          }
+
+          const response = await axios.post(
+            "http://localhost:8080/api/v1/project",
+            project,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+          console.log(response);
+          // Kiểm tra response
+          if (response.status === 201 && response.data) {
+            return { data: response.data };
+          } else {
+            console.error("❌ Unexpected response:");
+            return { error: "Unexpected response from server" };
+          }
+        } catch (error: any) {
+          console.error("❌ Error creating project:", error);
+          return {
+            error:
+              error.response?.data?.message || error.message || "Unknown error",
+          };
+        }
       },
     }),
+
     getTasks: build.query<Task[], { projectId: number }>({
       queryFn: async ({ projectId }) => {
         return {
@@ -691,7 +743,10 @@ export const api = createApi({
       },
     }),
 
-    createUserByAdmin: build.mutation<{ success: boolean }, { name: string; email: string; role: string }>({
+    createUserByAdmin: build.mutation<
+      { success: boolean },
+      { name: string; email: string; role: string }
+    >({
       queryFn: async (userData) => {
         try {
           console.log("🚀 Creating user by admin:", userData);
@@ -715,7 +770,7 @@ export const api = createApi({
             userData,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
-            }
+            },
           );
 
           if (!response.data) {
@@ -745,31 +800,37 @@ export const api = createApi({
           { id: 4, roleName: "Leader" },
         ];
 
-        console.log(`✅ Successfully returned ${fixedRoles.length} fixed roles`);
+        console.log(
+          `✅ Successfully returned ${fixedRoles.length} fixed roles`,
+        );
         return { data: fixedRoles };
       },
     }),
-    
+
     updateUser: build.mutation<User, { userId: string; data: Partial<User> }>({
       queryFn: async ({ userId, data }) => {
         try {
           console.log(`🔄 Updating user with ID: ${userId}`);
-        
+
           // Thêm thuộc tính password vào data
-          const updatedData = { ...data, password: "abc123", pictureProfile: "string",}; // Thêm password vào data
-        
+          const updatedData = {
+            ...data,
+            password: "abc123",
+            pictureProfile: "string",
+          }; // Thêm password vào data
+
           const storedUser = localStorage.getItem("user");
           if (!storedUser) {
             console.warn("⚠️ No user found in localStorage.");
             return { error: "User not authenticated" };
           }
-        
+
           const parsedUser = JSON.parse(storedUser);
           if (!parsedUser?.token) {
             console.warn("⚠️ Invalid token.");
             return { error: "Invalid authentication token" };
           }
-        
+
           const response = await axios.put(
             `http://localhost:8080/api/v1/user/${userId}`,
             updatedData, // Sử dụng updatedData thay vì data gốc
@@ -778,13 +839,13 @@ export const api = createApi({
                 Authorization: `Bearer ${parsedUser.token}`,
                 "Content-Type": "application/json",
               },
-            }
+            },
           );
-        
+
           if (!response.data || response.data.code !== 1000) {
             throw new Error("❌ Failed to update user");
           }
-        
+
           console.log("✅ User updated successfully:", response.data.result);
           return { data: response.data.result };
         } catch (error) {
@@ -794,16 +855,135 @@ export const api = createApi({
           };
         }
       },
-    })
-    
-    
+    }),
 
+    getProjectMilestone: build.query<any, void>({
+      queryFn: async () => {
+        try {
+          console.log("🔍 Fetching project milestones from API...");
+
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+
+          const response = await fetch(
+            "http://localhost:8080/api/v1/project/project-milestone",
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch project milestones");
+          }
+
+          const data = await response.json();
+          console.log(`✅ Successfully fetched ${data.length} milestones`);
+          return { data };
+        } catch (error: any) {
+          console.error("❌ Error fetching project milestones:", error);
+          return { error: { status: "FETCH_ERROR", message: error.message } };
+        }
+      },
+    }),
+
+    getProjectDetails: build.query<any, string>({
+      queryFn: async (projectId: string) => {
+        try {
+          console.log(`🔍 Fetching project details for ID: ${projectId}...`);
+
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+
+          const response = await fetch(
+            `http://localhost:8080/api/v1/project/${projectId}/details`,
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch project details");
+          }
+
+          const data = await response.json();
+          console.log("✅ Successfully fetched project details:", data);
+          return { data };
+        } catch (error: any) {
+          console.error("❌ Error fetching project details:", error);
+          return { error: { status: "FETCH_ERROR", message: error.message } };
+        }
+      },
+    }),
+
+    createMilestone: build.mutation<any, Milestone>({
+      queryFn: async (milestoneData: Milestone) => {
+        try {
+          console.log("🛠️ Creating milestone with data:", milestoneData);
+
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return {
+              error: { status: 401, message: "User not authenticated" },
+            };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: { status: 401, message: "Invalid token" } };
+          }
+
+          const response = await fetch(
+            "http://localhost:8080/api/v1/milestones",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(milestoneData),
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to create milestone");
+          }
+
+          const data = await response.json();
+          console.log("✅ Milestone created successfully:", data);
+          return { data };
+        } catch (error: any) {
+          console.error("❌ Error creating milestone:", error);
+          return { error: { status: "FETCH_ERROR", message: error.message } };
+        }
+      },
+    }),
   }),
-
-  
-
-
-  
 });
 
 export const {
@@ -821,5 +1001,8 @@ export const {
   useCreateUserByAdminMutation,
   useGetProjectsByUserQuery,
   useGetRolesQuery,
-  useUpdateUserMutation
+  useUpdateUserMutation,
+  useGetProjectMilestoneQuery,
+  useGetProjectDetailsQuery,
+  useCreateMilestoneMutation
 } = api;

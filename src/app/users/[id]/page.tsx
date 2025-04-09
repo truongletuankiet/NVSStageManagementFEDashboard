@@ -191,7 +191,7 @@ const PersonalPage = () => {
                 ))}
               </Select>
             ) : (
-              <ListItemText primary="Role" secondary={user.role?.name || "Chưa có Role"} />
+              <ListItemText primary="Role" secondary={user.role?.roleName || "Chưa có Role"} />
             )}
           </ListItem>
 
