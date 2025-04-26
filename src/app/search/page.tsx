@@ -56,14 +56,14 @@ const Search = () => {
               <h2>Projects</h2>
             )}
             {searchResults.projects?.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project.projectID} project={project} />
             ))}
 
             {searchResults.users && searchResults.users?.length > 0 && (
               <h2>Users</h2>
             )}
             {searchResults.users?.map((user) => (
-              <UserCard key={user.userId} user={user} />
+              <UserCard key={user.id} user={user} />
             ))}
           </div>
         )}

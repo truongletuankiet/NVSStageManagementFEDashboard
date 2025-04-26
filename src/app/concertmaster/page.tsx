@@ -69,7 +69,7 @@ const ConcertMaster = () => {
 
   const statusCount = projects.reduce(
     (acc: Record<string, number>, project: Project) => {
-      const status = project.endDate ? "Completed" : "Active";
+      const status = project.endTime ? "Completed" : "Active";
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
@@ -172,7 +172,7 @@ const ConcertMaster = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.map((project) => (
-              <motion.div whileHover={{ scale: 1.05 }} key={project.id}>
+              <motion.div whileHover={{ scale: 1.05 }} key={project.projectID}>
                 <ProjectCard project={project} />
               </motion.div>
             ))}
