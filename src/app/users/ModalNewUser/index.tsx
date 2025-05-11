@@ -12,8 +12,6 @@ import {
 import { useGetTeamsQuery, useCreateUserByAdminMutation } from "@/state/api";
 
 const roles = [
-  { id: 1, roleName: "Admin" },
-  { id: 2, roleName: "Concert Master" },
   { id: 3, roleName: "Staff" },
   { id: 4, roleName: "Leader" },
 ];
@@ -29,7 +27,7 @@ const ModalNewUser = ({ open, onClose }) => {
     password: "",
     departmentId: "",
     pictureProfile: "",
-    roleId: roles[2].id, // Mặc định là "Staff"
+    roleId: roles[0].id, // Mặc định là "Staff"
     status: "Active",
   });
 
@@ -43,7 +41,7 @@ const ModalNewUser = ({ open, onClose }) => {
         password: "",
         departmentId: "",
         pictureProfile: "",
-        roleId: roles[2].id,
+        roleId: roles[0].id,
         status: "Active",
       });
     }
@@ -134,14 +132,14 @@ const ModalNewUser = ({ open, onClose }) => {
             ))
           )}
         </TextField>
-        <TextField
+        {/* <TextField
           label="Profile Picture URL"
           name="pictureProfile"
           value={formData.pictureProfile}
           onChange={handleChange}
           fullWidth
           margin="dense"
-        />
+        /> */}
         <TextField
           select
           label="Role"

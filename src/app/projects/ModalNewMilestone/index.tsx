@@ -17,22 +17,34 @@ const ModalNewMilestone = ({ isOpen, onClose, projectID }: Props) => {
 
   const handleSubmit = async () => {
     if (!title || !startDate || !endDate || !projectID) return;
-
-    await createMilestone({
-      title,
-      description,
-      startDate,
-      endDate,
-      projectID,
-      events: [],
-    }).unwrap();
-
-    // Reset form or close modal after success
-    setTitle("");
-    setDescription("");
-    setStartDate("");
-    setEndDate("");
-    onClose();
+  
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+  
+    if (start > end) {
+      alert("Start date must be before or equal to end date.");
+      return;
+    }
+  
+    try {
+      await createMilestone({
+        title,
+        description,
+        startDate,
+        endDate,
+        projectID,
+        events: [],
+      }).unwrap();
+  
+      setTitle("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+      onClose();
+    } catch (err) {
+      alert("Failed to create milestone. Please try again.");
+      console.error(err);
+    }
   };
 
   const isFormValid = () => {

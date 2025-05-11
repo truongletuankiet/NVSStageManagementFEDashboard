@@ -9,6 +9,7 @@ import {
   AlertOctagon,
   AlertTriangle,
   Briefcase,
+  Calendar,
   ChevronDown,
   ChevronUp,
   Home,
@@ -92,17 +93,13 @@ const Sidebar = () => {
         </div>
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Home} label="Concert Master" href="/concertmaster" />
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
+          <SidebarLink icon={Home} label="Dashboard" href="/concertmaster" />
+          <SidebarLink icon={Calendar} label="Timeline" href="/timeline" />
           <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
+          <SidebarLink icon={Briefcase} label="Projects" href="/projects" />
         </nav>
 
-        {/* PROJECTS LINKS */}
-        <button
+        {/* <button
           onClick={() => setShowProjects((prev) => !prev)}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
         >
@@ -113,7 +110,6 @@ const Sidebar = () => {
             <ChevronDown className="h-5 w-5" />
           )}
         </button>
-        {/* PROJECTS LIST */}
         {showProjects &&
           projects?.map((project) => (
             <SidebarLink
@@ -124,7 +120,6 @@ const Sidebar = () => {
             />
           ))}
 
-        {/* PRIORITIES LINKS */}
         <button
           onClick={() => setShowPriority((prev) => !prev)}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
@@ -160,7 +155,7 @@ const Sidebar = () => {
               href="/priority/backlog"
             />
           </>
-        )}
+        )} */}
       </div>
       <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
         <div className="flex w-full items-center">

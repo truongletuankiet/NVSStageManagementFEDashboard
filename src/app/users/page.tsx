@@ -35,13 +35,6 @@ import {
 } from "@mui/x-data-grid";
 import Header from "@/components/Header";
 
-const CustomToolbar = () => (
-  <GridToolbarContainer>
-    <GridToolbarFilterButton />
-    <GridToolbarExport />
-  </GridToolbarContainer>
-);
-
 // Chọn màu theo Role
 const getRoleColor = (role: string) => {
   switch (role) {
@@ -87,9 +80,9 @@ const Users = () => {
     {
       field: "id",
       headerName: "ID",
-      width: 100,
-      headerAlign: "center",
-      align: "center",
+      flex: 1,
+      align: "left",
+      headerAlign: "left",
       sortable: false,
       renderCell: (params) => (
         <Tooltip title="Copy ID">
@@ -115,8 +108,9 @@ const Users = () => {
     {
       field: "fullName",
       headerName: "FULL NAME",
-      width: 250,
-      headerAlign: "center",
+      flex: 3.5,
+      align: "left",
+      headerAlign: "left",
       renderCell: (params) => (
         <Stack direction="row" spacing={2} alignItems="center" width="100%" onClick={() => router.push(`/users/${params.row.id}`)}>
 
@@ -157,17 +151,17 @@ const Users = () => {
     {
       field: "department",
       headerName: "Department",
-      width: 200,
-      headerAlign: "center",
-      align: "center",
+      align: "left",
+      headerAlign: "left",
+      flex: 2.5,
       renderCell: (params) => <Typography>{params.value?.name || "N/A"}</Typography>,
     },
     {
       field: "role",
       headerName: "ROLE",
-      width: 150,
-      headerAlign: "center",
-      align: "center",
+      align: "left",
+      headerAlign: "left",
+      flex: 1.5,
       renderCell: (params) => {
         const roleName = params.value?.roleName || "Unknown"; // Đảm bảo không bị lỗi undefined
         const { bg, text } = getRoleColor(roleName);
@@ -197,9 +191,9 @@ const Users = () => {
     {
       field: "actions",
       headerName: "ACTIONS",
-      width: 100,
-      headerAlign: "center",
-      align: "center",
+      flex: 1.5,
+      align: "left",
+      headerAlign: "left",
       sortable: false,
       renderCell: (params) => (
         <Tooltip title="More actions">
@@ -220,7 +214,7 @@ const Users = () => {
           color="primary"
           startIcon={<PersonAdd />}
           onClick={() => setOpenNewUserModal(true)}
-          sx={{ minWidth: 160, whiteSpace: "nowrap" }} // Đảm bảo đủ rộng và không xuống dòng
+          sx={{ minWidth: 160, whiteSpace: "nowrap" }}
         >
           New User
         </Button>
@@ -232,7 +226,6 @@ const Users = () => {
         columns={columns}
         getRowId={(row) => row.id}
         pagination
-        slots={{ toolbar: CustomToolbar }}
         sx={{
           mx: "auto", // 👈 căn giữa theo chiều ngang
           "& .MuiDataGrid-row:nth-of-type(odd)": { backgroundColor: "#FFFFFF" },
@@ -248,8 +241,7 @@ const Users = () => {
             fontWeight: "700 !important",  // Định dạng tiêu đề cột
           },
 
-          "& .MuiDataGrid-cell": { display: "flex", justifyContent: "center", alignItems: "center" },
-          width: "100%", maxWidth: 800, p: 0, boxShadow: 4, borderRadius: 2, bgcolor: "#fafafa"
+          "& .MuiDataGrid-cell": { display: "flex", alignItems: "center"}, p: 0, boxShadow: 4, borderRadius: 2, bgcolor: "#fafafa"
         }}
       />
 

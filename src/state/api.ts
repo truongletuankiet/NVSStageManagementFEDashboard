@@ -1,6 +1,7 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { mockUsers as mockUsersArray } from "../../public/mockUsers";
 import axios from "axios";
+import { BASE_URL } from "@/lib/utils";
 
 export interface Project {
   projectID: string; // ID của dự án (UUID)
@@ -57,6 +58,7 @@ export interface User {
     taskID: string;
     userID: string | null;
   }[];
+  roleID: string;
 }
 
 export interface Attachment {
@@ -379,7 +381,7 @@ export const api = createApi({
           console.log("🔍 Fetching authenticated user info...");
 
           const response = await axios.get(
-            "http://localhost:8080/api/v1/user/my-info",
+            `${BASE_URL}/api/v1/user/my-info`,
             {
               headers: {
                 Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
@@ -388,7 +390,7 @@ export const api = createApi({
           );
 
           if (!response.data || response.data.code !== 1000) {
-            throw new Error("❌ Failed to fetch authenticated user");
+            alert("❌ Failed to fetch authenticated user");
           }
 
           const user: User = response.data.result;
@@ -426,7 +428,7 @@ export const api = createApi({
 
           // 🔥 Gửi request có kèm token
           const response = await axios.get(
-            "http://localhost:8080/api/v1/project",
+            `${BASE_URL}/api/v1/project`,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
             },
@@ -437,12 +439,12 @@ export const api = createApi({
               "❌ Failed to fetch projects. Response:",
               response.data,
             );
-            throw new Error("Failed to fetch projects");
+            alert("Failed to fetch projects");
           }
 
           const projects: Project[] = response.data;
           if (!Array.isArray(projects)) {
-            throw new Error("❌ Invalid project data format");
+            alert("❌ Invalid project data format");
           }
 
           console.log(`✅ Successfully fetched ${projects.length} projects`);
@@ -476,7 +478,7 @@ export const api = createApi({
 
           // 🔥 Gửi request có kèm token
           const response = await axios.get(
-            `http://localhost:8080/api/v1/project/userId?userId=${userId}`,
+            `${BASE_URL}/api/v1/project/userId?userId=${userId}`,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
             },
@@ -487,12 +489,12 @@ export const api = createApi({
               "❌ Failed to fetch projects for user:",
               response.data,
             );
-            throw new Error("Failed to fetch projects");
+            alert("Failed to fetch projects");
           }
 
           const projects: Project[] = response.data;
           if (!Array.isArray(projects)) {
-            throw new Error("❌ Invalid project data format");
+            alert("❌ Invalid project data format");
           }
 
           console.log(
@@ -528,7 +530,7 @@ export const api = createApi({
           }
 
           const response = await axios.post(
-            "http://localhost:8080/api/v1/project",
+            `${BASE_URL}/api/v1/project`,
             project,
             {
               headers: {
@@ -540,12 +542,14 @@ export const api = createApi({
           console.log(response);
           // Kiểm tra response
           if (response.status === 201 && response.data) {
+            alert("✅ Project created successfully");
             return { data: response.data };
           } else {
             console.error("❌ Unexpected response:");
             return { error: "Unexpected response from server" };
           }
         } catch (error: any) {
+          alert("❌ Failed to create project");
           console.error("❌ Error creating project:", error);
           return {
             error:
@@ -602,7 +606,7 @@ export const api = createApi({
           }
 
           const response = await axios.get(
-            "http://localhost:8080/api/v1/user/get-all",
+            `${BASE_URL}/api/v1/user/get-all`,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
             },
@@ -610,12 +614,12 @@ export const api = createApi({
 
           if (!response.data || response.data.code !== 1000) {
             console.error("❌ Failed to fetch users. Response:", response.data);
-            throw new Error("Failed to fetch users");
+            alert("Failed to fetch users");
           }
 
           const users: User[] = response.data.result;
           if (!Array.isArray(users)) {
-            throw new Error("❌ Invalid user data format");
+            alert("❌ Invalid user data format");
           }
 
           console.log(`✅ Successfully fetched ${users.length} users`);
@@ -649,7 +653,7 @@ export const api = createApi({
 
           // 🔥 Gửi request có kèm token
           const response = await axios.get(
-            `http://localhost:8080/api/v1/user/${userId}`,
+            `${BASE_URL}/api/v1/user/${userId}`,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
             },
@@ -657,7 +661,7 @@ export const api = createApi({
 
           if (!response.data) {
             console.error("❌ Failed to fetch user. Response:", response.data);
-            throw new Error("Failed to fetch user");
+            alert("Failed to fetch user");
           }
 
           // ✅ Kiểm tra nếu response đúng format
@@ -665,7 +669,7 @@ export const api = createApi({
             !response.data?.result ||
             typeof response.data.result !== "object"
           ) {
-            throw new Error("Invalid user data");
+            alert("Invalid user data");
           }
 
           console.log(response.data.result);
@@ -698,7 +702,7 @@ export const api = createApi({
 
           // 🔥 Gửi request có kèm token
           const response = await fetch(
-            "http://localhost:8080/api/v1/departments",
+            `${BASE_URL}/api/v1/departments`,
             {
               headers: {
                 Authorization: `Bearer ${parsedUser.token}`,
@@ -708,7 +712,7 @@ export const api = createApi({
           );
 
           if (!response.ok) {
-            throw new Error("Failed to fetch teams");
+            alert("Failed to fetch teams");
           }
 
           const data = await response.json();
@@ -766,7 +770,7 @@ export const api = createApi({
 
           // 🔥 Gửi request có kèm token
           const response = await axios.post(
-            "http://localhost:8080/api/v1/user",
+            `${BASE_URL}/api/v1/user`,
             userData,
             {
               headers: { Authorization: `Bearer ${parsedUser.token}` },
@@ -775,7 +779,7 @@ export const api = createApi({
 
           if (!response.data) {
             console.error("❌ Failed to create user. Response:", response.data);
-            throw new Error("Failed to create user");
+            alert("Failed to create user");
           }
 
           return { data: { success: true } };
@@ -832,7 +836,7 @@ export const api = createApi({
           }
 
           const response = await axios.put(
-            `http://localhost:8080/api/v1/user/${userId}`,
+            `${BASE_URL}/api/v1/user/${userId}`,
             updatedData, // Sử dụng updatedData thay vì data gốc
             {
               headers: {
@@ -843,7 +847,7 @@ export const api = createApi({
           );
 
           if (!response.data || response.data.code !== 1000) {
-            throw new Error("❌ Failed to update user");
+            alert("❌ Failed to update user");
           }
 
           console.log("✅ User updated successfully:", response.data.result);
@@ -875,7 +879,7 @@ export const api = createApi({
           }
 
           const response = await fetch(
-            "http://localhost:8080/api/v1/project/project-milestone",
+            `${BASE_URL}/api/v1/project/project-milestone`,
             {
               headers: {
                 Authorization: `Bearer ${parsedUser.token}`,
@@ -885,7 +889,7 @@ export const api = createApi({
           );
 
           if (!response.ok) {
-            throw new Error("Failed to fetch project milestones");
+            alert("Failed to fetch project milestones");
           }
 
           const data = await response.json();
@@ -916,7 +920,7 @@ export const api = createApi({
           }
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/project/${projectId}/details`,
+            `${BASE_URL}/api/v1/project/${projectId}/details`,
             {
               headers: {
                 Authorization: `Bearer ${parsedUser.token}`,
@@ -926,7 +930,7 @@ export const api = createApi({
           );
 
           if (!response.ok) {
-            throw new Error("Failed to fetch project details");
+            alert("Failed to fetch project details");
           }
 
           const data = await response.json();
@@ -959,7 +963,7 @@ export const api = createApi({
           }
 
           const response = await fetch(
-            "http://localhost:8080/api/v1/milestones",
+            `${BASE_URL}/api/v1/milestones`,
             {
               method: "POST",
               headers: {
@@ -971,7 +975,7 @@ export const api = createApi({
           );
 
           if (!response.ok) {
-            throw new Error("Failed to create milestone");
+            alert("Failed to create milestone");
           }
 
           const data = await response.json();

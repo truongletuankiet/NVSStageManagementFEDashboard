@@ -1,7 +1,8 @@
 import Modal from "@/components/Modal";
 import { useCreateProjectMutation } from "@/state/api";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
+import { on } from "events";
 
 type Props = {
   isOpen: boolean;
@@ -18,6 +19,15 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [endDate, setEndDate] = useState("");
   const [createdBy, setCreatedBy] = useState("");
 
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      console.log("Parsed User:", parsedUser);
+      setCreatedBy(parsedUser.userId);
+    }
+  }, []);
+
 
   const handleSubmit = async () => {
     if (!projectName || !startDate || !endDate) return;
@@ -29,7 +39,7 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       representation: "complete",
     });
 
-    await createProject({
+    const res = await createProject({
       title: projectName,
       description,
       content,
@@ -39,11 +49,12 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       createdBy,
     }).unwrap();
 
+    onClose();
 
   };
 
   const isFormValid = () => {
-    return projectName && description && startDate && endDate && projectTypeID && createdBy;
+    return projectName && description && startDate && endDate && projectTypeID;
   };
 
 
@@ -98,18 +109,10 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
           onChange={(e) => setProjectTypeID(e.target.value)}
         >
           <option value="">Select Project Type</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
+          <option value="1">Goverment</option>
+          <option value="2">Academic</option>
+          <option value="3">Private</option>
         </select>
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Created By"
-          value={createdBy}
-          onChange={(e) => setCreatedBy(e.target.value)}
-        />
 
         <button
           type="submit"

@@ -1,6 +1,7 @@
 import { Project } from "@/state/api";
 import React from "react";
 import { CalendarDays, MoreHorizontal } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
 
 const backgroundImages = [
   "https://www.operacolorado.org/wp-content/uploads/2021/05/OC_Figaro_Staver_445-scaled.jpg",
@@ -29,9 +30,9 @@ const ProjectCard = ({ project }: { project: Project }) => {
       {/* Background Image */}
       <div className="relative w-full h-32 rounded-lg overflow-hidden">
         <img src={randomImage} alt="Project" className="w-full h-full object-cover" />
-        <div className="absolute top-3 right-3 bg-white p-1 rounded-full shadow">
+        {/* <div className="absolute top-3 right-3 bg-white p-1 rounded-full shadow">
           <MoreHorizontal className="h-5 w-5 text-gray-600" />
-        </div>
+        </div> */}
       </div>
 
       {/* Content */}
@@ -42,11 +43,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
         {/* Created Date */}
         <div className="mt-3 flex items-center text-sm text-gray-500">
           <CalendarDays className="h-4 w-4 text-blue-500" />
-          <span className="ml-2">Created: {project.startTime}</span>
+          <span className="ml-2">Created: {formatDateTime(project?.startTime)}</span>
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <div className="flex justify-between text-xs font-medium text-gray-400">
             <span>Tasks</span>
             <span>{progress}%</span>
@@ -57,10 +58,10 @@ const ProjectCard = ({ project }: { project: Project }) => {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-        </div>
+        </div> */}
 
         {/* Members */}
-        <div className="mt-4 flex items-center">
+        {/* <div className="mt-4 flex items-center">
           {dummyMembers.slice(0, 3).map((avatar, index) => (
             <img
               key={index}
@@ -72,7 +73,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
           {dummyMembers.length > 3 && (
             <span className="ml-2 text-sm text-gray-400">+{dummyMembers.length - 3}</span>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

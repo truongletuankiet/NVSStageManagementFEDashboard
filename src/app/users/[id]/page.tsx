@@ -69,6 +69,13 @@ const PersonalPage = () => {
   const router = useRouter();
   const [editedUser, setEditedUser] = useState({ fullName: "", email: "", dayOfBirth: "", departmentId: "", roleId: "" });
 
+  const rolesMap = [
+    { id: 1, roleName: "Admin" },
+    { id: 2, roleName: "Concert Master" },
+    { id: 3, roleName: "Staff" },
+    { id: 4, roleName: "Leader" },
+  ];
+
   useEffect(() => {
     if (!id) {
       router.push("/users");
@@ -109,6 +116,8 @@ const PersonalPage = () => {
     );
   }
 
+  console.log("User data:", user);
+
   const { bg, text } = getStatusColor(user.status);
 
   // const handleSave = async () => {
@@ -143,7 +152,7 @@ const PersonalPage = () => {
 
   return (
     <Box className="container h-full w-full bg-gradient-to-b from-blue-100 to-white p-8">
-      <Header name={`User: ${user.id}`} />
+      <Header name={`User Detail`} />
       <Card sx={{ maxWidth: 900, mx: "auto", p: 4, borderRadius: 3, boxShadow: 5 }}>
         <Box display="flex" alignItems="center" gap={3}>
           <Avatar src={user.pictureProfile || "/default-avatar.png"} alt={user.fullName} sx={{ width: 100, height: 100, border: "3px solid #3b82f6" }} />
@@ -191,7 +200,7 @@ const PersonalPage = () => {
                 ))}
               </Select>
             ) : (
-              <ListItemText primary="Role" secondary={user.role?.roleName || "Chưa có Role"} />
+              <ListItemText primary="Role" secondary={rolesMap.find(r => r.id === parseInt(user.roleID))?.roleName || "Chưa có Role"} />
             )}
           </ListItem>
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "./loginform";
 import "tailwindcss/tailwind.css";
+import { BASE_URL } from "@/lib/utils";
 
 const logo = "/HCMCONS_Logo.png";
 const backgroundMusic = "/music-bg.svg";
@@ -10,6 +11,8 @@ const backgroundMusic = "/music-bg.svg";
 interface User {
   email: string;
   token: string;
+  userId: string;
+  fullName: string;
   roles: string[];
 }
 
@@ -52,14 +55,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);
     try {
-        const response = await axios.post("http://localhost:8080/api/v1/auth/token", { email, password });
+        const response = await axios.post(`${BASE_URL}/api/v1/auth/token`, { email, password });
 
         if (!response.data || !response.data.result?.token) {
-            throw new Error("❌ Đăng nhập thất bại. Phản hồi API không hợp lệ!");
+            alert("❌ Đăng nhập thất bại. Phản hồi API không hợp lệ!");
         }
 
-        const { token } = response.data.result; 
-        const userData: User = { email, token };
+        const { token, userId } = response.data.result; 
+        const userData: User = { email, userId, token };
 
         // ✅ Lưu vào **localStorage** thay vì sessionStorage
         localStorage.setItem("user", JSON.stringify(userData));
@@ -86,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/user/register", {
+      const response = await axios.post(`${BASE_URL}/api/v1/user/register`, {
         fullName,
         dayOfBirth: new Date().toISOString().split("T")[0],
         email,
@@ -144,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth phải được sử dụng trong AuthProvider");
+    alert("useAuth phải được sử dụng trong AuthProvider");
   }
   return context;
 };
