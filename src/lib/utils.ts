@@ -30,3 +30,11 @@ export const dataGridSxStyles = (isDarkMode: boolean) => {
     },
   };
 };
+
+export const BASE_URL = "https://nvs.azurewebsites.net";
+
+export const formatDateTime = (dateString?: string) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleString("vi-VN");
+};
