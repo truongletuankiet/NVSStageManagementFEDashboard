@@ -4,10 +4,11 @@ import {
   Priority,
   Project,
   Task,
+  useGetDepartmentsQuery,
   useGetProjectsQuery,
   useGetTasksQuery,
 } from "@/state/api";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { useAppSelector } from "../redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
@@ -44,6 +45,7 @@ const ConcertMaster = () => {
     isLoading: tasksLoading,
     isError: tasksError,
   } = useGetTasksQuery({ projectId: parseInt("1") });
+
   const { data: projects, isLoading: isProjectsLoading } =
     useGetProjectsQuery();
 

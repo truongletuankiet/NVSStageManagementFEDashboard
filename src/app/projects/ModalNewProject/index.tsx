@@ -1,8 +1,16 @@
 import Modal from "@/components/Modal";
-import { useCreateProjectMutation } from "@/state/api";
+import { Department, useCreateProjectMutation, useGetDepartmentsQuery } from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { on } from "events";
+import {
+  Select,
+  MenuItem,
+  Checkbox,
+  ListItemText,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 
 type Props = {
   isOpen: boolean;
@@ -10,6 +18,8 @@ type Props = {
 };
 
 const ModalNewProject = ({ isOpen, onClose }: Props) => {
+  const { data: departments = [], isLoading: isDepartmentsLoading } = useGetDepartmentsQuery();
+
   const [createProject, { isLoading }] = useCreateProjectMutation();
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
@@ -18,8 +28,12 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [projectTypeID, setProjectTypeID] = useState("");
   const [endDate, setEndDate] = useState("");
   const [createdBy, setCreatedBy] = useState("");
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+
+
 
   useEffect(() => {
+
     const user = localStorage.getItem("user");
     if (user) {
       const parsedUser = JSON.parse(user);
@@ -47,6 +61,7 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       endTime: formattedEndDate,
       projectTypeID,
       createdBy,
+      departments: selectedDepartments,
     }).unwrap();
 
     onClose();
@@ -60,6 +75,8 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
 
   const inputStyles =
     "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
+
+  console.log("Departments:", selectedDepartments);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="Create New Project">
@@ -113,6 +130,31 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
           <option value="2">Academic</option>
           <option value="3">Private</option>
         </select>
+        <FormControl fullWidth>
+          <Select
+            labelId="department-multiselect-label"
+            multiple
+            value={selectedDepartments}
+            onChange={(e) => setSelectedDepartments(e.target.value as string[])}
+            renderValue={(selected) => {
+              if ((selected as string[]).length === 0) {
+                return <span>No departments selected</span>;
+              }
+              return departments
+                .filter((dept) => selected.includes(dept.id))
+                .map((dept) => dept.name)
+                .join(", ");
+            }}
+            displayEmpty
+          >
+            {departments.map((dept) => (
+              <MenuItem key={dept.id} value={dept.id}>
+                <Checkbox checked={selectedDepartments.includes(dept.id)} />
+                <ListItemText primary={dept.name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         <button
           type="submit"

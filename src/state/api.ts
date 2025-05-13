@@ -14,6 +14,7 @@ export interface Project {
   createdBy: string; // Người tạo dự án
   projectTypeID: string;
   projectTypeName: string;
+  departments: string[]; // Danh sách ID phòng ban liên quan
 }
 
 export interface Role {
@@ -110,6 +111,11 @@ export interface Milestone {
   endDate: string; // ISO format
   projectID: string;
   events: any[]; // có thể khai báo cụ thể hơn nếu biết rõ
+}
+
+export interface Department {
+  id: string;
+  name: string;
 }
 
 // === MOCK DATA ===
@@ -987,6 +993,47 @@ export const api = createApi({
         }
       },
     }),
+
+    getDepartments: build.query<Department[], void>({
+      queryFn: async () => {
+        try {
+          console.log(`🔍 Fetching departments ...`);
+
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) {
+            console.warn("⚠️ No user found in localStorage.");
+            return { error: "User not authenticated" };
+          }
+
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.token) {
+            console.warn("⚠️ Invalid token.");
+            return { error: "User not authenticated" };
+          }
+
+          const response = await fetch(
+            `${BASE_URL}/api/v1/departments`,
+            {
+              headers: {
+                Authorization: `Bearer ${parsedUser.token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            alert("Failed to fetch project details");
+          }
+
+          const data = await response.json();
+          console.log("✅ Successfully fetched project details:", data);
+          return { data };
+        } catch (error: any) {
+          console.error("❌ Error fetching project details:", error);
+          return { error: { status: "FETCH_ERROR", message: error.message } };
+        }
+      },
+    }),
   }),
 });
 
@@ -1008,5 +1055,6 @@ export const {
   useUpdateUserMutation,
   useGetProjectMilestoneQuery,
   useGetProjectDetailsQuery,
-  useCreateMilestoneMutation
+  useCreateMilestoneMutation,
+  useGetDepartmentsQuery
 } = api;
