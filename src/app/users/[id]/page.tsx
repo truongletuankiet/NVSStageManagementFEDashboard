@@ -117,6 +117,8 @@ const PersonalPage = () => {
   }
 
   console.log("User data:", user);
+  console.log("User data:", editedUser);
+  console.log("User data:", roles);
 
   const { bg, text } = getStatusColor(user.status);
 
@@ -141,7 +143,7 @@ const PersonalPage = () => {
       // Gọi hook useUpdateUserMutation và truyền đúng tham số
       const result = await updateUser({ userId: id, data: editedUser }).unwrap(); // unwrapped để lấy kết quả hoặc lỗi từ API call
       alert("User updated successfully!");
-      router.push(`/users/${id}`);
+      window.location.href = `/users/${id}`;
     } catch (error) {
       console.error("Error updating user:", error);
       alert("Failed to update user!");
@@ -194,7 +196,7 @@ const PersonalPage = () => {
           <ListItem>
             <ListItemIcon><Work /></ListItemIcon>
             {isEditing ? (
-              <Select fullWidth value={editedUser.roleId} onChange={(e) => setEditedUser({ ...editedUser, roleId: e.target.value })}>
+              <Select fullWidth value={editedUser.roleId || user.roleID} onChange={(e) => setEditedUser({ ...editedUser, roleId: e.target.value })}>
                 {roles?.map((role) => (
                   <MenuItem key={role.id} value={role.id}>{role.roleName}</MenuItem>
                 ))}
