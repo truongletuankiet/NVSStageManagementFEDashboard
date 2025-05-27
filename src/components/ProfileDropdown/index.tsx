@@ -77,10 +77,10 @@ const ProfileDropdown = ({ user }: { user: UserInterface }) => {
               </button>
 
               {/* Menu Options */}
-              <button className="flex w-full items-center gap-3 rounded-lg p-3 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              {/* <button className="flex w-full items-center gap-3 rounded-lg p-3 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <Store className="h-5 w-5" />
                 <span>Your Shop</span>
-              </button>
+              </button> */}
 
               <button className="flex w-full items-center gap-3 rounded-lg p-3 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <Book className="h-5 w-5" />
