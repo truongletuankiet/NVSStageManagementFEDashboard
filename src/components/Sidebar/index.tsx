@@ -60,7 +60,7 @@ const Sidebar = () => {
         {/* TOP LOGO */}
         <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
           <div className="text-xl font-bold text-gray-800 dark:text-white">
-          HCMCONS
+            HCMCONS
           </div>
           {isSidebarCollapsed ? null : (
             <button
@@ -76,7 +76,7 @@ const Sidebar = () => {
         {/* TEAM */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
-            src="https://scontent.fsgn1-1.fna.fbcdn.net/v/t39.30808-6/476450745_1016467233655474_8915782888244074_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEjQXSz-Gwwbb-Vjk3zSScRjhQORqcmw8iOFA5GpybDyPcPeWj11JpUVb5u66Rr4BE_WQMs5uImuONbWOJzsU_z&_nc_ohc=7nMfn4Hef7MQ7kNvgFavNzB&_nc_oc=Adh1BZYAthEzoRiTxyhvgTV1pXLzH5Rk-YRrUMxLmSQQ7Fpexz_4IJIda8QqlAegUZQ&_nc_zt=23&_nc_ht=scontent.fsgn1-1.fna&_nc_gid=A64KLm7H49k0mfTSVSTJeZO&oh=00_AYBXeMQPJ_3cgW6lvRNDR2i9lkivCx23ZYGgK4QTJoDmSg&oe=67C8B5B9"
+            src="/HCMCONS_Logo.png"
             alt="Logo"
             width={40}
             height={40}
@@ -201,9 +201,8 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   return (
     <Link href={href} className="w-full">
       <div
-        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-        } justify-start px-8 py-3`}
+        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
+          } justify-start px-8 py-3`}
       >
         {isActive && (
           <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
