@@ -73,6 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         console.log("✅ Đăng nhập thành công:", userData);
+
+        window.location.href = "/concertmaster"; // Chuyển hướng về trang chính sau khi đăng nhập thành công
     } catch (err) {
         console.error("❌ Lỗi đăng nhập:", err);
         setError("Đăng nhập thất bại. Kiểm tra lại thông tin!");
