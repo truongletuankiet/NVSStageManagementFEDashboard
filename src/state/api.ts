@@ -386,14 +386,11 @@ export const api = createApi({
 
           console.log("🔍 Fetching authenticated user info...");
 
-          const response = await axios.get(
-            `${BASE_URL}/api/v1/user/my-info`,
-            {
-              headers: {
-                Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
-              },
+          const response = await axios.get(`${BASE_URL}/api/v1/user/my-info`, {
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`, // 🔥 Thêm token vào headers
             },
-          );
+          });
 
           if (!response.data || response.data.code !== 1000) {
             alert("❌ Failed to fetch authenticated user");
@@ -433,12 +430,9 @@ export const api = createApi({
           }
 
           // 🔥 Gửi request có kèm token
-          const response = await axios.get(
-            `${BASE_URL}/api/v1/project`,
-            {
-              headers: { Authorization: `Bearer ${parsedUser.token}` },
-            },
-          );
+          const response = await axios.get(`${BASE_URL}/api/v1/project`, {
+            headers: { Authorization: `Bearer ${parsedUser.token}` },
+          });
 
           if (!response.data) {
             console.error(
@@ -548,7 +542,6 @@ export const api = createApi({
           console.log(response);
           // Kiểm tra response
           if (response.status === 201 && response.data) {
-            alert("✅ Project created successfully");
             return { data: response.data };
           } else {
             console.error("❌ Unexpected response:");
@@ -611,12 +604,9 @@ export const api = createApi({
             return { error: "User not authenticated" };
           }
 
-          const response = await axios.get(
-            `${BASE_URL}/api/v1/user/get-all`,
-            {
-              headers: { Authorization: `Bearer ${parsedUser.token}` },
-            },
-          );
+          const response = await axios.get(`${BASE_URL}/api/v1/user/get-all`, {
+            headers: { Authorization: `Bearer ${parsedUser.token}` },
+          });
 
           if (!response.data || response.data.code !== 1000) {
             console.error("❌ Failed to fetch users. Response:", response.data);
@@ -707,15 +697,12 @@ export const api = createApi({
           }
 
           // 🔥 Gửi request có kèm token
-          const response = await fetch(
-            `${BASE_URL}/api/v1/departments`,
-            {
-              headers: {
-                Authorization: `Bearer ${parsedUser.token}`,
-                "Content-Type": "application/json",
-              },
+          const response = await fetch(`${BASE_URL}/api/v1/departments`, {
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`,
+              "Content-Type": "application/json",
             },
-          );
+          });
 
           if (!response.ok) {
             alert("Failed to fetch teams");
@@ -968,17 +955,14 @@ export const api = createApi({
             return { error: { status: 401, message: "Invalid token" } };
           }
 
-          const response = await fetch(
-            `${BASE_URL}/api/v1/milestones`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${parsedUser.token}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(milestoneData),
+          const response = await fetch(`${BASE_URL}/api/v1/milestones`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`,
+              "Content-Type": "application/json",
             },
-          );
+            body: JSON.stringify(milestoneData),
+          });
 
           if (!response.ok) {
             alert("Failed to create milestone");
@@ -1011,15 +995,12 @@ export const api = createApi({
             return { error: "User not authenticated" };
           }
 
-          const response = await fetch(
-            `${BASE_URL}/api/v1/departments`,
-            {
-              headers: {
-                Authorization: `Bearer ${parsedUser.token}`,
-                "Content-Type": "application/json",
-              },
+          const response = await fetch(`${BASE_URL}/api/v1/departments`, {
+            headers: {
+              Authorization: `Bearer ${parsedUser.token}`,
+              "Content-Type": "application/json",
             },
-          );
+          });
 
           if (!response.ok) {
             alert("Failed to fetch project details");
@@ -1056,5 +1037,5 @@ export const {
   useGetProjectMilestoneQuery,
   useGetProjectDetailsQuery,
   useCreateMilestoneMutation,
-  useGetDepartmentsQuery
+  useGetDepartmentsQuery,
 } = api;

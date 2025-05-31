@@ -77,7 +77,6 @@ const ConcertMaster = () => {
     },
     {},
   );
-  
 
   const projectStatus = Object.keys(statusCount).map((key) => ({
     name: key,
@@ -112,9 +111,9 @@ const ConcertMaster = () => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="text-2xl font-bold text-gray-700 dark:text-white text-center mb-6"
+        className="mb-6 text-center text-2xl font-bold text-gray-700 dark:text-white"
       >
-        Welcome to Concert Master! 🎶
+        Welcome to Concert Master!
       </motion.h2>
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -156,7 +155,10 @@ const ConcertMaster = () => {
             <PieChart>
               <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
                 {projectStatus.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -174,7 +176,7 @@ const ConcertMaster = () => {
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             HCMC Conservatory Projects
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {projects.map((project) => (
               <motion.div whileHover={{ scale: 1.05 }} key={project.projectID}>
                 <ProjectCard project={project} />

@@ -1,5 +1,5 @@
-import HomePage from "./home/page";
+import ConcertMaster from "./concertmaster/page";
 
 export default function Home() {
-  return <HomePage />;
+  return <ConcertMaster />;
 }

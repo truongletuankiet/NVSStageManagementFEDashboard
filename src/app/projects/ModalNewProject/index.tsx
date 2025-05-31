@@ -1,16 +1,19 @@
 import Modal from "@/components/Modal";
-import { Department, useCreateProjectMutation, useGetDepartmentsQuery } from "@/state/api";
+import {
+  Department,
+  useCreateProjectMutation,
+  useGetDepartmentsQuery,
+} from "@/state/api";
 import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
-import { on } from "events";
 import {
   Select,
   MenuItem,
   Checkbox,
   ListItemText,
-  InputLabel,
   FormControl,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 type Props = {
   isOpen: boolean;
@@ -18,7 +21,8 @@ type Props = {
 };
 
 const ModalNewProject = ({ isOpen, onClose }: Props) => {
-  const { data: departments = [], isLoading: isDepartmentsLoading } = useGetDepartmentsQuery();
+  const { data: departments = [], isLoading: isDepartmentsLoading } =
+    useGetDepartmentsQuery();
 
   const [createProject, { isLoading }] = useCreateProjectMutation();
   const [projectName, setProjectName] = useState("");
@@ -30,18 +34,15 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [createdBy, setCreatedBy] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
-
+  const router = useRouter();
 
   useEffect(() => {
-
     const user = localStorage.getItem("user");
     if (user) {
       const parsedUser = JSON.parse(user);
-      console.log("Parsed User:", parsedUser);
       setCreatedBy(parsedUser.userId);
     }
   }, []);
-
 
   const handleSubmit = async () => {
     if (!projectName || !startDate || !endDate) return;
@@ -53,30 +54,31 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       representation: "complete",
     });
 
-    const res = await createProject({
-      title: projectName,
-      description,
-      content,
-      startTime: formattedStartDate,
-      endTime: formattedEndDate,
-      projectTypeID,
-      createdBy,
-      departments: selectedDepartments,
-    }).unwrap();
+    try {
+      await createProject({
+        title: projectName,
+        description,
+        startTime: formattedStartDate,
+        endTime: formattedEndDate,
+        projectTypeID,
+        createdBy,
+        departments: selectedDepartments,
+      }).unwrap();
 
-    onClose();
-
+      onClose();
+      // Redirect về trang danh sách project
+      router.push("/projects");
+    } catch (err) {
+      // Có thể hiện toast báo lỗi ở đây nếu muốn
+    }
   };
 
   const isFormValid = () => {
     return projectName && description && startDate && endDate && projectTypeID;
   };
 
-
   const inputStyles =
     "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
-
-  console.log("Departments:", selectedDepartments);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="Create New Project">
@@ -100,12 +102,7 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <textarea
-          className={inputStyles}
-          placeholder="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
           <input
             type="date"
@@ -158,8 +155,9 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
 
         <button
           type="submit"
-          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
-            }`}
+          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+            !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+          }`}
           disabled={!isFormValid() || isLoading}
         >
           {isLoading ? "Creating..." : "Create Project"}

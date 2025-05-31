@@ -18,7 +18,8 @@ const roles = [
 
 const ModalNewUser = ({ open, onClose }) => {
   const { data: departments, isLoading, isError } = useGetTeamsQuery();
-  const [createUserByAdmin, { isLoading: isCreating }] = useCreateUserByAdminMutation();
+  const [createUserByAdmin, { isLoading: isCreating }] =
+    useCreateUserByAdminMutation();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -63,7 +64,9 @@ const ModalNewUser = ({ open, onClose }) => {
       onClose();
     } catch (error) {
       console.error("❌ Failed to create user:", error);
-      alert("Failed to create user: " + (error?.data?.message || "Unknown error"));
+      alert(
+        "Failed to create user: " + (error?.data?.message || "Unknown error"),
+      );
     }
   };
 
@@ -80,16 +83,7 @@ const ModalNewUser = ({ open, onClose }) => {
           margin="dense"
           required
         />
-        <TextField
-          label="Date of Birth"
-          name="dayOfBirth"
-          type="date"
-          value={formData.dayOfBirth}
-          onChange={handleChange}
-          fullWidth
-          margin="dense"
-          InputLabelProps={{ shrink: true }}
-        />
+
         <TextField
           label="Email"
           name="email"
@@ -160,7 +154,12 @@ const ModalNewUser = ({ open, onClose }) => {
         <Button onClick={onClose} color="secondary" disabled={isCreating}>
           Cancel
         </Button>
-        <Button onClick={handleSubmit} color="primary" variant="contained" disabled={isCreating}>
+        <Button
+          onClick={handleSubmit}
+          color="primary"
+          variant="contained"
+          disabled={isCreating}
+        >
           {isCreating ? <CircularProgress size={24} /> : "Add"}
         </Button>
       </DialogActions>
